@@ -3,15 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/mapsFragment2">
+    app:startDestination="@id/mapsFragment">
 
     <fragment
-        android:id="@+id/mapsFragment2"
+        android:id="@+id/mapsFragment"
         android:name="me.fernandesleite.alagou.ui.MapsFragment"
         android:label="MapsFragment" >
         <action
-            android:id="@+id/action_mapsFragment2_to_requestLocationFragment"
+            android:id="@+id/action_mapsFragment_to_requestLocationFragment"
             app:destination="@id/requestLocationFragment" />
+        <action
+            android:id="@+id/action_mapsFragment_to_createFloodingMapsFragment"
+            app:destination="@id/createFloodingMapsFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out"
+            app:popUpTo="@id/mapsFragment"/>
     </fragment>
     <fragment
         android:id="@+id/requestLocationFragment"
@@ -20,6 +28,21 @@
         tools:layout="@layout/fragment_request_location" >
         <action
             android:id="@+id/action_requestLocationFragment_to_mapsFragment2"
-            app:destination="@id/mapsFragment2" />
+            app:destination="@id/mapsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/createFloodingMapsFragment"
+        android:name="me.fernandesleite.alagou.ui.CreateFloodingMapsFragment"
+        android:label="fragment_create_flooding_maps"
+        tools:layout="@layout/fragment_create_flooding_maps" >
+        <argument
+            android:name="latitude"
+            app:argType="float" />
+        <argument
+            android:name="longitude"
+            app:argType="float" />
+        <argument
+            android:name="zoom"
+            app:argType="float" />
     </fragment>
 </navigation>

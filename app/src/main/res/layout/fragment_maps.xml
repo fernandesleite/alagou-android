@@ -11,8 +11,7 @@
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        >
+        android:layout_width="match_parent" >
 
         <fragment
             android:id="@+id/map"
@@ -20,18 +19,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context=".ui.MapsFragment" />
-
-
-
         <com.nambimobile.widgets.efab.ExpandableFabLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <!-- The next 3 Views will only display in portrait orientation -->
             <com.nambimobile.widgets.efab.Overlay
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-
+                app:overlay_color="#000"
 
                 app:overlay_orientation="portrait"/>
             <com.nambimobile.widgets.efab.ExpandableFab
@@ -44,21 +39,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:fab_orientation="portrait"
+                app:fab_icon="@drawable/ic_settings_24"
                 app:label_text="Configurações"/>
             <com.nambimobile.widgets.efab.FabOption
+                android:id="@+id/btn_criar_ponto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:fab_icon="@drawable/ic_add_location_24"
                 app:fab_orientation="portrait"
                 app:label_text="Criar ponto de alagamento"/>
             <com.nambimobile.widgets.efab.FabOption
+                android:id="@+id/btn_traffic"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:fab_orientation="portrait"
-                app:label_text="Sua localização no mapa está ativa"/>
-            <com.nambimobile.widgets.efab.FabOption
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:fab_orientation="portrait"
+                app:fab_icon="@drawable/ic_traffic_24"
                 app:label_text="Tráfego desativado"/>
 
             <com.google.android.material.bottomappbar.BottomAppBar
@@ -66,14 +61,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
+                android:paddingHorizontal="60dp"
                 app:fabAlignmentMode="end"
                 style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
                 tools:ignore="BottomAppBar">
                 <TextView
                     android:id="@+id/bottomAppBarText"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#000"/>
+                    android:textColor="@color/colorAccent"
+                    android:text="100 alagamentos encontrados"/>
             </com.google.android.material.bottomappbar.BottomAppBar>
 
         </com.nambimobile.widgets.efab.ExpandableFabLayout>

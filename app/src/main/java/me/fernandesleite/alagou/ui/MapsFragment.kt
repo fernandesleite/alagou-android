@@ -28,10 +28,10 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import me.fernandesleite.alagou.R
 import me.fernandesleite.alagou.databinding.FragmentMapsBinding
-import me.fernandesleite.alagou.models.Flooding
 
 class MapsFragment : Fragment() {
 
@@ -44,9 +44,14 @@ class MapsFragment : Fragment() {
     private lateinit var navController: NavController
 
     private val callback = OnMapReadyCallback { googleMap ->
+        googleMap.setMapStyle(
+            MapStyleOptions.loadRawResourceStyle(
+                requireContext(),
+                R.raw.map_style_main
+            )
+        )
         map = googleMap
         enableLocation(map)
-        setMapLongClick(map)
         viewModel.flooding.observe(viewLifecycleOwner, Observer { floodings ->
             binding.bottomAppBarText.text = getString(
                 R.string.quantityFloodingsPlaceholder,
@@ -62,7 +67,6 @@ class MapsFragment : Fragment() {
                     )
                 )
             }
-            Toast.makeText(context, floodings.size.toString(), Toast.LENGTH_LONG).show()
         })
     }
 
@@ -74,6 +78,20 @@ class MapsFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(MapsViewModel::class.java)
         binding = FragmentMapsBinding.inflate(inflater)
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+        binding.btnCriarPonto.setOnClickListener { navigateToCreateFloodingMap() }
+        binding.btnTraffic.setOnClickListener {
+            map.isTrafficEnabled = !map.isTrafficEnabled
+            if (map.isTrafficEnabled) {
+                binding.btnTraffic.label.labelText = "Tráfego ativado"
+                binding.btnTraffic.fabOptionColor =
+                    ContextCompat.getColor(requireContext(), R.color.active)
+            } else {
+                binding.btnTraffic.label.labelText = "Tráfego desativado"
+                binding.btnTraffic.fabOptionColor =
+                    ContextCompat.getColor(requireContext(), R.color.colorAccent)
+            }
+        }
+
         return binding.root
     }
 
@@ -98,25 +116,6 @@ class MapsFragment : Fragment() {
         val width = 100
         val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.ic_map_maker)
         return Bitmap.createScaledBitmap(bitmap, width, height, false)
-    }
-
-    private fun setMapLongClick(map: GoogleMap) {
-        map.setOnMapLongClickListener { latLng ->
-            map.addMarker(
-                MarkerOptions()
-                    .position(latLng)
-            )
-            viewModel.createFlooding(
-                Flooding(
-                    "test",
-                    latLng.latitude,
-                    latLng.longitude,
-                    1,
-                    "test",
-                    "test"
-                )
-            )
-        }
     }
 
     private fun enableLocation(map: GoogleMap): Boolean {
@@ -188,7 +187,7 @@ class MapsFragment : Fragment() {
 
             }
         } else {
-            navController.navigate(R.id.action_mapsFragment2_to_requestLocationFragment)
+            navController.navigate(R.id.action_mapsFragment_to_requestLocationFragment)
             Toast.makeText(activity, "Location Off", Toast.LENGTH_LONG).show()
         }
 
@@ -203,6 +202,16 @@ class MapsFragment : Fragment() {
             CameraUpdateFactory.newLatLngZoom(
                 currentLocationLatLng,
                 15f
+            )
+        )
+    }
+
+    private fun navigateToCreateFloodingMap() {
+        navController.navigate(
+            MapsFragmentDirections.actionMapsFragmentToCreateFloodingMapsFragment(
+                map.cameraPosition.target.latitude.toFloat(),
+                map.cameraPosition.target.longitude.toFloat(),
+                map.cameraPosition.zoom
             )
         )
     }
