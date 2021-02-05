@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mapsFragment2">
+
+    <fragment
+        android:id="@+id/mapsFragment2"
+        android:name="me.fernandesleite.alagou.MapsFragment"
+        android:label="MapsFragment" >
+        <action
+            android:id="@+id/action_mapsFragment2_to_requestLocationFragment"
+            app:destination="@id/requestLocationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/requestLocationFragment"
+        android:name="me.fernandesleite.alagou.RequestLocationFragment"
+        android:label="fragment_request_location"
+        tools:layout="@layout/fragment_request_location" >
+        <action
+            android:id="@+id/action_requestLocationFragment_to_mapsFragment2"
+            app:destination="@id/mapsFragment2" />
+    </fragment>
+</navigation>

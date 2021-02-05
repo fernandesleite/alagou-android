@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RequestLocationFragment"
+    android:background="@color/quantum_white_100"
+    android:gravity="center"
+    android:padding="32dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/alagou_precisa_de_sua_localiza_o"
+        android:textAlignment="center"
+        android:textColor="#000"
+        android:textSize="32sp"/>
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginVertical="60dp"
+        android:src="@drawable/ic_request_location"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textColor="#000"
+        android:textSize="16sp"
+        android:text="@string/para_aproveitar_as_funcionalidades_do_alagou_ative_seu_gps_e_d_acesso_a_sua_localiza_o" />
+
+    <Button
+        android:id="@+id/btn_gps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:paddingHorizontal="20dp"
+        android:layout_gravity="center"
+        android:textSize="16sp"
+        android:backgroundTint="@color/colorAccent"
+        android:text="@string/ativar_gps"/>
+
+</LinearLayout>

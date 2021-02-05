@@ -1,42 +1,70 @@
 package me.fernandesleite.alagou
 
+import android.Manifest
 import android.annotation.SuppressLint
-import androidx.fragment.app.Fragment
-
+import android.content.Context
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import com.google.android.gms.location.FusedLocationProviderClient
-
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-
-import android.Manifest
-import android.content.pm.PackageManager
-import android.location.Location
-import android.widget.Toast
-import androidx.core.content.ContextCompat
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.MarkerOptions
+import me.fernandesleite.alagou.databinding.FragmentMapsBinding
+import me.fernandesleite.alagou.models.Flooding
 
 class MapsFragment : Fragment() {
 
-    private val TAG = "Maps Fragment"
-
     private val REQUEST_LOCATION_PERMISSION = 1
-
+    private var startedUp = true
     private lateinit var map: GoogleMap
-
+    private lateinit var binding: FragmentMapsBinding
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
+    private lateinit var viewModel: MapsViewModel
+    private lateinit var navController: NavController
 
 
     private val callback = OnMapReadyCallback { googleMap ->
         map = googleMap
-        requestPermission(googleMap)
-        setMyLocation(map)
+        enableLocation(map)
+        setMapLongClick(map)
+        viewModel.flooding.observe(viewLifecycleOwner, Observer { floodings ->
+            binding.bottomAppBarText.text = getString(
+                R.string.quantityFloodingsPlaceholder,
+                floodings.size
+            )
+            floodings.forEach {
+                map.addMarker(
+                    generateHomeMarker(requireContext()).position(
+                        LatLng(
+                            it.latitude,
+                            it.longitude
+                        )
+                    )
+                )
+            }
+            Toast.makeText(context, floodings.size.toString(), Toast.LENGTH_LONG).show()
+        })
     }
 
     override fun onCreateView(
@@ -44,8 +72,10 @@ class MapsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-        return inflater.inflate(R.layout.fragment_maps, container, false)
+        viewModel = ViewModelProvider(this).get(MapsViewModel::class.java)
+        binding = FragmentMapsBinding.inflate(inflater)
+        navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -54,50 +84,122 @@ class MapsFragment : Fragment() {
         mapFragment?.getMapAsync(callback)
     }
 
-    private fun enableLocation(map: GoogleMap): Boolean {
-         if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED) {
-            map.isMyLocationEnabled = true
-            return true
-        }
-        return false
+    private fun generateHomeMarker(context: Context): MarkerOptions {
+        return MarkerOptions()
+            .icon(BitmapDescriptorFactory.fromBitmap(generateSmallIcon(context)))
     }
 
+    private fun generateSmallIcon(context: Context): Bitmap {
+        val height = 100
+        val width = 100
+        val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.ic_map_maker)
+        return Bitmap.createScaledBitmap(bitmap, width, height, false)
+    }
 
-    private fun requestPermission(map: GoogleMap) {
-        if (!enableLocation(map)){
-            requestPermissions(
-                arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
-                REQUEST_LOCATION_PERMISSION
+    private fun setMapLongClick(map: GoogleMap) {
+        map.setOnMapLongClickListener { latLng ->
+            map.addMarker(
+                MarkerOptions()
+                    .position(latLng)
+            )
+            viewModel.create(
+                Flooding(
+                    "test",
+                    latLng.latitude,
+                    latLng.longitude,
+                    1,
+                    "test",
+                    "test"
+                )
             )
         }
     }
 
+    private fun enableLocation(map: GoogleMap): Boolean {
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            if(startedUp){
+                startUpLocationCamera(map)
+                map.isMyLocationEnabled = true
+                startedUp = !startedUp
+            }
+            return true
+        }
+        else {
+            requestPermission(map)
+            return false
+        }
+
+    }
+
+
+    private fun requestPermission(map: GoogleMap) {
+            requestPermissions(
+                arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
+                REQUEST_LOCATION_PERMISSION
+            )
+    }
+
     @SuppressLint("MissingPermission")
-    private fun setMyLocation(map: GoogleMap) {
+    private fun startUpLocationCamera(map: GoogleMap) {
+        val service: LocationManager =
+            context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val enabled: Boolean = service
+            .isProviderEnabled(LocationManager.GPS_PROVIDER)
         var currentLoc: Location?
-        val zoomLevel = 15f
+
+        if (enabled) {
+            mFusedLocationClient =
+                LocationServices.getFusedLocationProviderClient(requireActivity())
             mFusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 currentLoc = location
                 if (location != null) {
-                    val currentLocationLatLng = LatLng(
-                        currentLoc!!.latitude,
-                        currentLoc!!.longitude
-                    )
-                    map.moveCamera(
-                        CameraUpdateFactory.newLatLngZoom(
-                            currentLocationLatLng,
-                            zoomLevel
-                        )
-                    )
+                    moveCameraCurrentLocation(currentLoc)
                     enableLocation(map)
                 } else {
-                    Toast.makeText(activity, "Location Off", Toast.LENGTH_LONG).show()
+                    val locationListener = object : LocationListener {
+                        override fun onLocationChanged(currentLoc: Location?) {
+                            moveCameraCurrentLocation(currentLoc)
+                            enableLocation(map)
+                            service.removeUpdates(this)
+                        }
+
+                        override fun onStatusChanged(
+                            provider: String?,
+                            status: Int,
+                            extras: Bundle?
+                        ) {}
+                        override fun onProviderEnabled(provider: String?) {}
+                        override fun onProviderDisabled(provider: String?) {}
+                    }
+                    service.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER, 0,
+                        0f, locationListener
+                    );
                 }
 
+            }
+        } else {
+            navController.navigate(R.id.action_mapsFragment2_to_requestLocationFragment)
+            Toast.makeText(activity, "Location Off", Toast.LENGTH_LONG).show()
         }
+
+    }
+
+    private fun moveCameraCurrentLocation(currentLoc: Location?) {
+        val currentLocationLatLng = LatLng(
+            currentLoc!!.latitude,
+            currentLoc.longitude
+        )
+        map.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                currentLocationLatLng,
+                15f
+            )
+        )
     }
 
     override fun onRequestPermissionsResult(
@@ -108,7 +210,7 @@ class MapsFragment : Fragment() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_LOCATION_PERMISSION) {
             if (grantResults.contains(PackageManager.PERMISSION_GRANTED)) {
-                setMyLocation(map)
+                enableLocation(map)
             }
         }
     }
