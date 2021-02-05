@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RequestLocationFragment"
+    tools:context=".ui.RequestLocationFragment"
     android:background="@color/quantum_white_100"
     android:gravity="center"
     android:padding="32dp"
@@ -22,6 +22,7 @@
         android:layout_height="150dp"
         android:layout_marginVertical="60dp"
         android:src="@drawable/ic_request_location"
+        android:contentDescription="@string/alagou_precisa_de_sua_localiza_o"
         />
 
     <TextView

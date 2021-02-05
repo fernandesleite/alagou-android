@@ -1,4 +1,4 @@
-package me.fernandesleite.alagou
+package me.fernandesleite.alagou.ui
 
 import android.app.Activity
 import android.content.Intent
@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.gms.location.LocationRequest
+import me.fernandesleite.alagou.R
 
 class MainActivity : AppCompatActivity() {
 

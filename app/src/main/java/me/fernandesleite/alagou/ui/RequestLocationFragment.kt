@@ -1,4 +1,4 @@
-package me.fernandesleite.alagou
+package me.fernandesleite.alagou.ui
 
 import android.content.IntentSender
 import android.os.Bundle
@@ -13,6 +13,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
+import me.fernandesleite.alagou.R
 
 class RequestLocationFragment : Fragment() {
 
@@ -49,7 +50,6 @@ class RequestLocationFragment : Fragment() {
                 .checkLocationSettings(builder.build())
         result.addOnCompleteListener { task ->
             try {
-                val response = task.getResult(ApiException::class.java)
             } catch (exception: ApiException) {
                 when (exception.statusCode) {
                     LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {

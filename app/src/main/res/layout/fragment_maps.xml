@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="me.fernandesleite.alagou.MapsViewModel" />
+            type="me.fernandesleite.alagou.ui.MapsViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -19,7 +19,7 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".MapsFragment" />
+            tools:context=".ui.MapsFragment" />
 
 
 

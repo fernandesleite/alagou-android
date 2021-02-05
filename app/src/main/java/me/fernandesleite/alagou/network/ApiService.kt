@@ -1,4 +1,4 @@
-package me.fernandesleite.alagou.services
+package me.fernandesleite.alagou.network
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -15,11 +15,15 @@ private const val BASE_URL = "http://192.168.15.3:8888/"
 
 private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
 
-private val retrofit = Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(MoshiConverterFactory.create(moshi)).build()
+private val retrofit =
+    Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(MoshiConverterFactory.create(moshi))
+        .build()
 
 interface ApiService {
-    @GET("floodings") suspend fun getFloodings(): List<Flooding>
-    @POST("floodings")  fun createFlooding(@Body flooding: Flooding): Call<Flooding>
+    @GET("floodings")
+    fun getFloodings(): Call<List<Flooding>>
+    @POST("floodings")
+    fun createFlooding(@Body flooding: Flooding): Call<Flooding>
 }
 
 object Api {

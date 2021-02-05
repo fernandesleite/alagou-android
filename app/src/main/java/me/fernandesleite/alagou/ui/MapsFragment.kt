@@ -1,4 +1,4 @@
-package me.fernandesleite.alagou
+package me.fernandesleite.alagou.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -10,7 +10,6 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,6 +29,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import me.fernandesleite.alagou.R
 import me.fernandesleite.alagou.databinding.FragmentMapsBinding
 import me.fernandesleite.alagou.models.Flooding
 
@@ -42,7 +42,6 @@ class MapsFragment : Fragment() {
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private lateinit var viewModel: MapsViewModel
     private lateinit var navController: NavController
-
 
     private val callback = OnMapReadyCallback { googleMap ->
         map = googleMap
@@ -84,6 +83,11 @@ class MapsFragment : Fragment() {
         mapFragment?.getMapAsync(callback)
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.getFloodings()
+    }
+
     private fun generateHomeMarker(context: Context): MarkerOptions {
         return MarkerOptions()
             .icon(BitmapDescriptorFactory.fromBitmap(generateSmallIcon(context)))
@@ -102,7 +106,7 @@ class MapsFragment : Fragment() {
                 MarkerOptions()
                     .position(latLng)
             )
-            viewModel.create(
+            viewModel.createFlooding(
                 Flooding(
                     "test",
                     latLng.latitude,
@@ -121,26 +125,25 @@ class MapsFragment : Fragment() {
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            if(startedUp){
+            if (startedUp) {
                 startUpLocationCamera(map)
                 map.isMyLocationEnabled = true
                 startedUp = !startedUp
             }
             return true
-        }
-        else {
-            requestPermission(map)
+        } else {
+            requestPermission()
             return false
         }
 
     }
 
 
-    private fun requestPermission(map: GoogleMap) {
-            requestPermissions(
-                arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
-                REQUEST_LOCATION_PERMISSION
-            )
+    private fun requestPermission() {
+        requestPermissions(
+            arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
+            REQUEST_LOCATION_PERMISSION
+        )
     }
 
     @SuppressLint("MissingPermission")
@@ -171,14 +174,16 @@ class MapsFragment : Fragment() {
                             provider: String?,
                             status: Int,
                             extras: Bundle?
-                        ) {}
+                        ) {
+                        }
+
                         override fun onProviderEnabled(provider: String?) {}
                         override fun onProviderDisabled(provider: String?) {}
                     }
                     service.requestLocationUpdates(
                         LocationManager.GPS_PROVIDER, 0,
                         0f, locationListener
-                    );
+                    )
                 }
 
             }

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/mapsFragment2"
-        android:name="me.fernandesleite.alagou.MapsFragment"
+        android:name="me.fernandesleite.alagou.ui.MapsFragment"
         android:label="MapsFragment" >
         <action
             android:id="@+id/action_mapsFragment2_to_requestLocationFragment"
@@ -15,7 +15,7 @@
     </fragment>
     <fragment
         android:id="@+id/requestLocationFragment"
-        android:name="me.fernandesleite.alagou.RequestLocationFragment"
+        android:name="me.fernandesleite.alagou.ui.RequestLocationFragment"
         android:label="fragment_request_location"
         tools:layout="@layout/fragment_request_location" >
         <action
