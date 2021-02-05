@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Alagou</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="quantityFloodingsPlaceholder">"%d alagamentos encontrados"</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="alagou_precisa_de_sua_localiza_o">Alagou! precisa de sua localização</string>
+    <string name="para_aproveitar_as_funcionalidades_do_alagou_ative_seu_gps_e_d_acesso_a_sua_localiza_o">Para aproveitar as funcionalidades do Alagou!, ative seu GPS e dê acesso a sua localização</string>
+    <string name="ativar_gps">Ativar GPS</string>
+    <string name="cancelar_ponto">Cancelar Ponto</string>
+    <string name="criar_ponto">Criar ponto</string>
+</resources>
