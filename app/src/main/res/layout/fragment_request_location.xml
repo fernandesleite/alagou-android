@@ -3,8 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.RequestLocationFragment"
-    android:background="@color/quantum_white_100"
+    tools:context=".ui.mainmap.RequestLocationFragment"
     android:gravity="center"
     android:padding="32dp"
     android:orientation="vertical">
@@ -14,7 +13,8 @@
         android:layout_height="wrap_content"
         android:text="@string/alagou_precisa_de_sua_localiza_o"
         android:textAlignment="center"
-        android:textColor="#000"
+        android:textAppearance="@style/FontTitle"
+        android:textColor="@color/black"
         android:textSize="32sp"/>
 
     <ImageView
@@ -29,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:textColor="#000"
+        android:textColor="@color/black"
         android:textSize="16sp"
         android:text="@string/para_aproveitar_as_funcionalidades_do_alagou_ative_seu_gps_e_d_acesso_a_sua_localiza_o" />
 

@@ -1,11 +1,9 @@
-package me.fernandesleite.alagou.ui
+package me.fernandesleite.alagou.ui.mainmap
 
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -26,12 +24,12 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.MarkerOptions
 import me.fernandesleite.alagou.R
 import me.fernandesleite.alagou.databinding.FragmentMapsBinding
+import me.fernandesleite.alagou.models.Flooding
+import me.fernandesleite.alagou.util.GenerateMarkerIcon
 
 class MapsFragment : Fragment() {
 
@@ -43,56 +41,20 @@ class MapsFragment : Fragment() {
     private lateinit var viewModel: MapsViewModel
     private lateinit var navController: NavController
 
-    private val callback = OnMapReadyCallback { googleMap ->
-        googleMap.setMapStyle(
-            MapStyleOptions.loadRawResourceStyle(
-                requireContext(),
-                R.raw.map_style_main
-            )
-        )
-        map = googleMap
-        enableLocation(map)
-        viewModel.flooding.observe(viewLifecycleOwner, Observer { floodings ->
-            binding.bottomAppBarText.text = getString(
-                R.string.quantityFloodingsPlaceholder,
-                floodings.size
-            )
-            floodings.forEach {
-                map.addMarker(
-                    generateHomeMarker(requireContext()).position(
-                        LatLng(
-                            it.latitude,
-                            it.longitude
-                        )
-                    )
-                )
-            }
-        })
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         viewModel = ViewModelProvider(this).get(MapsViewModel::class.java)
-        binding = FragmentMapsBinding.inflate(inflater)
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-        binding.btnCriarPonto.setOnClickListener { navigateToCreateFloodingMap() }
-        binding.btnTraffic.setOnClickListener {
-            map.isTrafficEnabled = !map.isTrafficEnabled
-            if (map.isTrafficEnabled) {
-                binding.btnTraffic.label.labelText = "Tráfego ativado"
-                binding.btnTraffic.fabOptionColor =
-                    ContextCompat.getColor(requireContext(), R.color.active)
-            } else {
-                binding.btnTraffic.label.labelText = "Tráfego desativado"
-                binding.btnTraffic.fabOptionColor =
-                    ContextCompat.getColor(requireContext(), R.color.colorAccent)
-            }
+        binding = FragmentMapsBinding.inflate(inflater)
+        binding.apply {
+            lifecycleOwner = this@MapsFragment
+            btnCriarPonto.setOnClickListener { navigateToCreateFloodingMap() }
+            btnTraffic.setOnClickListener { toggleTrafego() }
+            return root
         }
-
-        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -106,17 +68,8 @@ class MapsFragment : Fragment() {
         viewModel.getFloodings()
     }
 
-    private fun generateHomeMarker(context: Context): MarkerOptions {
-        return MarkerOptions()
-            .icon(BitmapDescriptorFactory.fromBitmap(generateSmallIcon(context)))
-    }
 
-    private fun generateSmallIcon(context: Context): Bitmap {
-        val height = 100
-        val width = 100
-        val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.ic_map_maker)
-        return Bitmap.createScaledBitmap(bitmap, width, height, false)
-    }
+    // -------- Permission / Init ----------
 
     private fun enableLocation(map: GoogleMap): Boolean {
         if (ContextCompat.checkSelfPermission(
@@ -136,7 +89,6 @@ class MapsFragment : Fragment() {
         }
 
     }
-
 
     private fun requestPermission() {
         requestPermissions(
@@ -206,6 +158,20 @@ class MapsFragment : Fragment() {
         )
     }
 
+    // --------- Callbacks ----------
+
+    private val callback = OnMapReadyCallback { googleMap ->
+        googleMap.setMapStyle(
+            MapStyleOptions.loadRawResourceStyle(
+                requireContext(),
+                R.raw.map_style_main
+            )
+        )
+        map = googleMap
+        enableLocation(map)
+        viewModel.flooding.observe(viewLifecycleOwner, Observer { addMaker(it) })
+    }
+
     private fun navigateToCreateFloodingMap() {
         navController.navigate(
             MapsFragmentDirections.actionMapsFragmentToCreateFloodingMapsFragment(
@@ -214,6 +180,43 @@ class MapsFragment : Fragment() {
                 map.cameraPosition.zoom
             )
         )
+    }
+
+    private fun toggleTrafego() {
+        map.isTrafficEnabled = !map.isTrafficEnabled
+        if (map.isTrafficEnabled) {
+            binding.btnTraffic.label.labelText = "Tráfego ativado"
+            binding.btnTraffic.fabOptionColor =
+                ContextCompat.getColor(requireContext(), R.color.active)
+        } else {
+            binding.btnTraffic.label.labelText = "Tráfego desativado"
+            binding.btnTraffic.fabOptionColor =
+                ContextCompat.getColor(requireContext(), R.color.colorAccent)
+        }
+    }
+
+    private fun addMaker(floodings: List<Flooding>) {
+        if(floodings.isEmpty()) {
+            binding.bottomAppBarText.text = getString(R.string.quantityFloodingsPlaceholder_Zero)
+        }
+        else {
+            binding.bottomAppBarText.text = resources.getQuantityString(
+                R.plurals.quantityFloodingsPlaceholder,
+                floodings.size,
+                floodings.size
+            )
+        }
+
+        floodings.forEach {
+            map.addMarker(
+                GenerateMarkerIcon.generateMarker(requireContext()).position(
+                    LatLng(
+                        it.latitude,
+                        it.longitude
+                    )
+                )
+            )
+        }
     }
 
     override fun onRequestPermissionsResult(

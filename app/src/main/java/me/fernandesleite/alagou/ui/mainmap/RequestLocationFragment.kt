@@ -1,4 +1,4 @@
-package me.fernandesleite.alagou.ui
+package me.fernandesleite.alagou.ui.mainmap
 
 import android.content.IntentSender
 import android.os.Bundle
@@ -70,6 +70,4 @@ class RequestLocationFragment : Fragment() {
             }
         }
     }
-
-
 }

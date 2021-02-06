@@ -1,4 +1,4 @@
-package me.fernandesleite.alagou.ui
+package me.fernandesleite.alagou.ui.mainmap
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -13,10 +13,6 @@ class MapsViewModel(application: Application) : AndroidViewModel(application) {
     private val _floodings = MutableLiveData<List<Flooding>>()
     val flooding: LiveData<List<Flooding>>
         get() = _floodings
-
-    fun createFlooding(flooding: Flooding) {
-        floodingRepository.createFlooding(flooding)
-    }
 
     fun getFloodings() {
         floodingRepository.getFloodings(_floodings)

@@ -7,8 +7,8 @@
 
     <fragment
         android:id="@+id/mapsFragment"
-        android:name="me.fernandesleite.alagou.ui.MapsFragment"
-        android:label="MapsFragment" >
+        android:name="me.fernandesleite.alagou.ui.mainmap.MapsFragment"
+        android:label="" >
         <action
             android:id="@+id/action_mapsFragment_to_requestLocationFragment"
             app:destination="@id/requestLocationFragment" />
@@ -23,7 +23,7 @@
     </fragment>
     <fragment
         android:id="@+id/requestLocationFragment"
-        android:name="me.fernandesleite.alagou.ui.RequestLocationFragment"
+        android:name="me.fernandesleite.alagou.ui.mainmap.RequestLocationFragment"
         android:label="fragment_request_location"
         tools:layout="@layout/fragment_request_location" >
         <action
@@ -32,8 +32,8 @@
     </fragment>
     <fragment
         android:id="@+id/createFloodingMapsFragment"
-        android:name="me.fernandesleite.alagou.ui.CreateFloodingMapsFragment"
-        android:label="fragment_create_flooding_maps"
+        android:name="me.fernandesleite.alagou.ui.createflooding.CreateFloodingMapsFragment"
+        android:label="Selecione no mapa"
         tools:layout="@layout/fragment_create_flooding_maps" >
         <argument
             android:name="latitude"
@@ -44,5 +44,28 @@
         <argument
             android:name="zoom"
             app:argType="float" />
+        <action
+            android:id="@+id/action_createFloodingMapsFragment_to_createFloodingDetailsFragment"
+            app:destination="@id/createFloodingDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/createFloodingDetailsFragment"
+        android:name="me.fernandesleite.alagou.ui.createflooding.CreateFloodingDetailsFragment"
+        android:label="Informe os dados"
+        tools:layout="@layout/fragment_create_flooding_details" >
+        <argument
+            android:name="latitude"
+            app:argType="float" />
+        <argument
+            android:name="longitude"
+            app:argType="float" />
+        <argument
+            android:name="zoom"
+            app:argType="float" />
+        <action
+            android:id="@+id/action_createFloodingDetailsFragment_to_mapsFragment"
+            app:destination="@id/mapsFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>
