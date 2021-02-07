@@ -8,6 +8,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +27,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.gms.maps.model.Marker
 import me.fernandesleite.alagou.R
 import me.fernandesleite.alagou.databinding.FragmentMapsBinding
 import me.fernandesleite.alagou.models.Flooding
@@ -55,6 +57,7 @@ class MapsFragment : Fragment() {
             btnTraffic.setOnClickListener { toggleTrafego() }
             return root
         }
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -169,7 +172,13 @@ class MapsFragment : Fragment() {
         )
         map = googleMap
         enableLocation(map)
-        viewModel.flooding.observe(viewLifecycleOwner, Observer { addMaker(it) })
+        map.setOnMarkerClickListener {
+                viewModel.getFlooding(it.tag.toString())
+                true
+        }
+        viewModel.flooding.observe(viewLifecycleOwner, Observer {
+        })
+        viewModel.floodings.observe(viewLifecycleOwner, Observer { addMaker(it) })
     }
 
     private fun navigateToCreateFloodingMap() {
@@ -215,7 +224,7 @@ class MapsFragment : Fragment() {
                         it.longitude
                     )
                 )
-            )
+            ).tag = it._id
         }
     }
 

@@ -16,6 +16,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textfield.TextInputEditText
 import me.fernandesleite.alagou.R
 import me.fernandesleite.alagou.models.Flooding
+import me.fernandesleite.alagou.models.FloodingPost
 import me.fernandesleite.alagou.util.LatLong
 
 class CreateFloodingDetailsFragment : Fragment() {
@@ -57,7 +58,7 @@ class CreateFloodingDetailsFragment : Fragment() {
 
     private fun createFloodingListener(view: View) {
         viewModel.createFlooding(
-            Flooding(
+            FloodingPost(
                 latLong.latitude,
                 latLong.longitude,
                 view.findViewById<TextInputEditText>(R.id.observacoes).text.toString(),

@@ -3,12 +3,14 @@ package me.fernandesleite.alagou.network
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import me.fernandesleite.alagou.models.Flooding
+import me.fernandesleite.alagou.models.FloodingPost
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 
 private const val BASE_URL = "http://192.168.15.3:8888/"
@@ -22,8 +24,12 @@ private val retrofit =
 interface ApiService {
     @GET("floodings")
     fun getFloodings(): Call<List<Flooding>>
+
     @POST("floodings")
-    fun createFlooding(@Body flooding: Flooding): Call<Flooding>
+    fun createFlooding(@Body flooding: FloodingPost): Call<FloodingPost>
+
+    @GET("floodings/{id}")
+    fun getFlooding(@Path("id") id: String): Call<Flooding>
 }
 
 object Api {
