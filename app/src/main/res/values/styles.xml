@@ -28,5 +28,4 @@
         <item name="android:layout_marginStart">16dp</item>
         <item name="backgroundTint">@color/colorAccent</item>
     </style>
-
 </resources>

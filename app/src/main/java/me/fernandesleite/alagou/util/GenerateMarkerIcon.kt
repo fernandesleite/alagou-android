@@ -15,9 +15,9 @@ class GenerateMarkerIcon {
         }
 
         private fun generateSmallIcon(context: Context): Bitmap {
-            val height = 100
-            val width = 100
-            val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.ic_map_maker)
+            val height = 120
+            val width = 80
+            val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.ic_map_marker)
             return Bitmap.createScaledBitmap(bitmap, width, height, false)
         }
     }

@@ -8,7 +8,6 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,7 +26,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.Marker
 import me.fernandesleite.alagou.R
 import me.fernandesleite.alagou.databinding.FragmentMapsBinding
 import me.fernandesleite.alagou.models.Flooding
@@ -173,11 +171,9 @@ class MapsFragment : Fragment() {
         map = googleMap
         enableLocation(map)
         map.setOnMarkerClickListener {
-                viewModel.getFlooding(it.tag.toString())
-                true
+            navController.navigate(MapsFragmentDirections.actionMapsFragmentToDisplayFloodingInfoFragment(it.tag.toString()))
+            true
         }
-        viewModel.flooding.observe(viewLifecycleOwner, Observer {
-        })
         viewModel.floodings.observe(viewLifecycleOwner, Observer { addMaker(it) })
     }
 
@@ -205,10 +201,9 @@ class MapsFragment : Fragment() {
     }
 
     private fun addMaker(floodings: List<Flooding>) {
-        if(floodings.isEmpty()) {
+        if (floodings.isEmpty()) {
             binding.bottomAppBarText.text = getString(R.string.quantityFloodingsPlaceholder_Zero)
-        }
-        else {
+        } else {
             binding.bottomAppBarText.text = resources.getQuantityString(
                 R.plurals.quantityFloodingsPlaceholder,
                 floodings.size,
