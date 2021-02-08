@@ -23,6 +23,10 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
+        def properties = new Properties()
+        file("../local.properties").withInputStream { properties.load(it) }
+        manifestPlaceholders = [ googleMapsApiKey:"${properties.getProperty('google_maps_key')}"]
+        resValue "string", "google_maps_key", properties.getProperty('google_maps_key')
     }
     buildFeatures {
         dataBinding true
@@ -69,5 +73,7 @@ dependencies {
 
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.3"
     implementation "androidx.navigation:navigation-ui-ktx:2.3.3"
+
+    implementation 'com.google.android.libraries.places:places:2.4.0'
 
 }

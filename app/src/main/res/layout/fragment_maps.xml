@@ -4,83 +4,102 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="viewModel"
             type="me.fernandesleite.alagou.ui.mainmap.MapsViewModel" />
     </data>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context=".ui.mainmap.MapsFragment" />
-
-        <com.nambimobile.widgets.efab.ExpandableFabLayout
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.nambimobile.widgets.efab.Overlay
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:overlay_color="@color/black"
-                app:overlay_orientation="portrait" />
+                tools:context=".ui.mainmap.MapsFragment" />
 
-            <com.nambimobile.widgets.efab.ExpandableFab
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:efab_closingAnimationDurationMs="10"
-                app:efab_orientation="portrait"
-                app:layout_anchor="@id/bottomAppBar" />
-
-            <com.nambimobile.widgets.efab.FabOption
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:fab_icon="@drawable/ic_settings_24"
-                app:fab_orientation="portrait"
-                app:label_text="Configurações" />
-
-            <com.nambimobile.widgets.efab.FabOption
-                android:id="@+id/btn_criar_ponto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:fab_icon="@drawable/ic_add_location_24"
-                app:fab_orientation="portrait"
-                app:label_text="Criar ponto de alagamento" />
-
-            <com.nambimobile.widgets.efab.FabOption
-                android:id="@+id/btn_traffic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:fab_icon="@drawable/ic_traffic_24"
-                app:fab_orientation="portrait"
-                app:label_text="Tráfego desativado" />
-
-            <com.google.android.material.bottomappbar.BottomAppBar
-                android:id="@+id/bottomAppBar"
-                style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
+            <com.nambimobile.widgets.efab.ExpandableFabLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:paddingHorizontal="60dp"
-                app:fabAlignmentMode="end"
-                tools:ignore="BottomAppBar">
+                android:layout_height="match_parent">
 
-                <TextView
-                    android:id="@+id/bottomAppBarText"
+                <com.nambimobile.widgets.efab.Overlay
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:overlay_color="@color/black"
+                    app:overlay_orientation="portrait" />
+
+                <com.nambimobile.widgets.efab.ExpandableFab
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/nunito"
-                    android:textColor="@color/colorAccent" />
-            </com.google.android.material.bottomappbar.BottomAppBar>
+                    app:efab_closingAnimationDurationMs="10"
+                    app:efab_orientation="portrait"
+                    app:layout_anchor="@id/bottomAppBar" />
 
-        </com.nambimobile.widgets.efab.ExpandableFabLayout>
+                <com.nambimobile.widgets.efab.FabOption
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:fab_icon="@drawable/ic_settings_24"
+                    app:fab_orientation="portrait"
+                    app:label_text="Configurações" />
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+                <com.nambimobile.widgets.efab.FabOption
+                    android:id="@+id/btn_criar_ponto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:fab_icon="@drawable/ic_add_location_24"
+                    app:fab_orientation="portrait"
+                    app:label_text="Criar ponto de alagamento" />
+
+                <com.nambimobile.widgets.efab.FabOption
+                    android:id="@+id/btn_traffic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:fab_icon="@drawable/ic_traffic_24"
+                    app:fab_orientation="portrait"
+                    app:label_text="Tráfego desativado" />
+
+                <com.google.android.material.bottomappbar.BottomAppBar
+                    android:id="@+id/bottomAppBar"
+                    style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:paddingHorizontal="60dp"
+                    app:fabAlignmentMode="end"
+                    tools:ignore="BottomAppBar">
+
+                    <TextView
+                        android:id="@+id/bottomAppBarText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/nunito"
+                        android:textColor="@color/colorAccent" />
+                </com.google.android.material.bottomappbar.BottomAppBar>
+
+            </com.nambimobile.widgets.efab.ExpandableFabLayout>
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="20dp"
+            android:layout_margin="16dp">
+            <fragment
+                android:id="@+id/autocomplete_fragment"
+                android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </androidx.cardview.widget.CardView>
+    </FrameLayout>
+
 </layout>
 
 
