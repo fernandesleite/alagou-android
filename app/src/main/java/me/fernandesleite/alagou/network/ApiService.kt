@@ -7,23 +7,25 @@ import me.fernandesleite.alagou.models.FloodingPost
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
-
+import retrofit2.http.*
 
 private const val BASE_URL = "http://192.168.15.3:8888/"
 
 private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
 
 private val retrofit =
-    Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(MoshiConverterFactory.create(moshi))
-        .build()
+        Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(MoshiConverterFactory.create(moshi))
+                .build()
 
 interface ApiService {
     @GET("floodings")
-    fun getFloodings(): Call<List<Flooding>>
+    fun getFloodings(@Query("minlat") minLat: Double,
+                     @Query("maxlat") maxLat: Double,
+                     @Query("minlng") minLng: Double,
+                     @Query("maxlng") maxLng: Double): Call<List<Flooding>>
+
+    @GET("floodings/all")
+   fun getAllFloodings(): Call<List<Flooding>>
 
     @POST("floodings")
     fun createFlooding(@Body flooding: FloodingPost): Call<FloodingPost>

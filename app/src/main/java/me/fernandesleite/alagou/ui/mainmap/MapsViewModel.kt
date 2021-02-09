@@ -1,6 +1,7 @@
 package me.fernandesleite.alagou.ui.mainmap
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,8 +18,8 @@ class MapsViewModel(application: Application) : AndroidViewModel(application) {
     val flooding: LiveData<Flooding>
         get() = _flooding
 
-    fun getFloodings() {
-        floodingRepository.getFloodings(_floodings)
+    fun getFloodings(minLat: Double, maxLat: Double,  minLng: Double, maxLng: Double) {
+        floodingRepository.getFloodings(_floodings, minLat, maxLat,  minLng, maxLng)
     }
 
     fun getFlooding(id: String){

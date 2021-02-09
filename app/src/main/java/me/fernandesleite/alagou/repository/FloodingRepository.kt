@@ -11,8 +11,15 @@ import retrofit2.Response
 
 class FloodingRepository {
 
-    fun getFloodings(floodings: MutableLiveData<List<Flooding>>) {
-        val call: Call<List<Flooding>> = Api.retrofitService.getFloodings()
+    fun getFloodings(
+        floodings: MutableLiveData<List<Flooding>>,
+        minLat: Double,
+        maxLat: Double,
+        minLng: Double,
+        maxLng: Double
+    ) {
+        val call: Call<List<Flooding>> =
+            Api.retrofitService.getFloodings(minLat, maxLat, minLng, maxLng)
         call.enqueue(object : Callback<List<Flooding>> {
             override fun onResponse(
                 call: Call<List<Flooding>>,
@@ -43,7 +50,7 @@ class FloodingRepository {
 
     fun getFlooding(id: String, flooding: MutableLiveData<Flooding>) {
         val call: Call<Flooding> = Api.retrofitService.getFlooding(id)
-        call.enqueue(object  : Callback<Flooding> {
+        call.enqueue(object : Callback<Flooding> {
             override fun onResponse(call: Call<Flooding>, response: Response<Flooding>) {
                 Log.d("ViewModel", "success")
                 flooding.value = response.body()

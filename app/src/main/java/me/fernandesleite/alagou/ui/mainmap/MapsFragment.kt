@@ -12,12 +12,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AutoCompleteTextView
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -27,6 +25,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMap.OnCameraIdleListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
@@ -51,15 +50,15 @@ class MapsFragment : Fragment() {
     private lateinit var navController: NavController
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View {
         viewModel = ViewModelProvider(this).get(MapsViewModel::class.java)
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
         binding = FragmentMapsBinding.inflate(inflater)
 
-        Places.initialize(requireContext(), resources.getString(R.string.google_maps_key))
+        Places.initialize(requireContext(), resources.getString(R.string.google_maps_api_key))
         val autocompleteFragment =
             childFragmentManager.findFragmentById(R.id.autocomplete_fragment)
                     as AutocompleteSupportFragment
@@ -86,26 +85,18 @@ class MapsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-
-
         mapFragment?.getMapAsync(callback)
-    }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.getFloodings()
     }
-
 
     // -------- Permission / Init ----------
 
     private fun enableLocation(map: GoogleMap): Boolean {
         if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
+                        requireContext(),
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
         ) {
             if (startedUp) {
                 startUpLocationCamera(map)
@@ -122,8 +113,8 @@ class MapsFragment : Fragment() {
 
     private fun requestPermission() {
         requestPermissions(
-            arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
-            REQUEST_LOCATION_PERMISSION
+                arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
+                REQUEST_LOCATION_PERMISSION
         )
     }
 
@@ -152,9 +143,9 @@ class MapsFragment : Fragment() {
                         }
 
                         override fun onStatusChanged(
-                            provider: String?,
-                            status: Int,
-                            extras: Bundle?
+                                provider: String?,
+                                status: Int,
+                                extras: Bundle?
                         ) {
                         }
 
@@ -162,8 +153,8 @@ class MapsFragment : Fragment() {
                         override fun onProviderDisabled(provider: String?) {}
                     }
                     service.requestLocationUpdates(
-                        LocationManager.GPS_PROVIDER, 0,
-                        0f, locationListener
+                            LocationManager.GPS_PROVIDER, 0,
+                            0f, locationListener
                     )
                 }
 
@@ -177,15 +168,23 @@ class MapsFragment : Fragment() {
 
     private fun moveCameraCurrentLocation(currentLoc: Location?) {
         val currentLocationLatLng = LatLng(
-            currentLoc!!.latitude,
-            currentLoc.longitude
+                currentLoc!!.latitude,
+                currentLoc.longitude
         )
         map.moveCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                currentLocationLatLng,
-                15f
-            )
+                CameraUpdateFactory.newLatLngZoom(
+                        currentLocationLatLng,
+                        15f
+                )
         )
+        val test = map.projection.visibleRegion.latLngBounds
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(this::map.isInitialized){
+            getFloodingsInsideBounds()
+        }
     }
 
     // --------- Callbacks ----------
@@ -196,15 +195,15 @@ class MapsFragment : Fragment() {
         // change My Location button from behind searchbar
         val locationButton= (mapView?.findViewById<View>(Integer.parseInt("1"))?.parent as View).findViewById<View>(Integer.parseInt("2"))
         val rlp=locationButton.layoutParams as (RelativeLayout.LayoutParams)
-        rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP,0)
-        rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,0)
-        rlp.setMargins(0,250,100,0)
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0)
+        rlp.setMargins(0, 250, 100, 0)
 
         googleMap.setMapStyle(
-            MapStyleOptions.loadRawResourceStyle(
-                requireContext(),
-                R.raw.map_style_main
-            )
+                MapStyleOptions.loadRawResourceStyle(
+                        requireContext(),
+                        R.raw.map_style_main
+                )
         )
         map = googleMap
         enableLocation(map)
@@ -212,16 +211,26 @@ class MapsFragment : Fragment() {
             navController.navigate(MapsFragmentDirections.actionMapsFragmentToDisplayFloodingInfoFragment(it.tag.toString()))
             true
         }
+        map.setOnCameraIdleListener {getFloodingsInsideBounds()}
         viewModel.floodings.observe(viewLifecycleOwner, Observer { addMaker(it) })
+    }
+
+    private fun getFloodingsInsideBounds() {
+        val bounds = map.projection.visibleRegion.latLngBounds
+        val boundsMaxLat = bounds.northeast.latitude
+        val boundsMaxLng = bounds.northeast.longitude
+        val boundsMinLat = bounds.southwest.latitude
+        val boundsMinLng = bounds.southwest.longitude
+        viewModel.getFloodings(boundsMinLat, boundsMaxLat, boundsMinLng, boundsMaxLng)
     }
 
     private fun navigateToCreateFloodingMap() {
         navController.navigate(
-            MapsFragmentDirections.actionMapsFragmentToCreateFloodingMapsFragment(
-                map.cameraPosition.target.latitude.toFloat(),
-                map.cameraPosition.target.longitude.toFloat(),
-                map.cameraPosition.zoom
-            )
+                MapsFragmentDirections.actionMapsFragmentToCreateFloodingMapsFragment(
+                        map.cameraPosition.target.latitude.toFloat(),
+                        map.cameraPosition.target.longitude.toFloat(),
+                        map.cameraPosition.zoom
+                )
         )
     }
 
@@ -243,28 +252,28 @@ class MapsFragment : Fragment() {
             binding.bottomAppBarText.text = getString(R.string.quantityFloodingsPlaceholder_Zero)
         } else {
             binding.bottomAppBarText.text = resources.getQuantityString(
-                R.plurals.quantityFloodingsPlaceholder,
-                floodings.size,
-                floodings.size
+                    R.plurals.quantityFloodingsPlaceholder,
+                    floodings.size,
+                    floodings.size
             )
         }
 
         floodings.forEach {
             map.addMarker(
-                GenerateMarkerIcon.generateMarker(requireContext()).position(
-                    LatLng(
-                        it.latitude,
-                        it.longitude
+                    GenerateMarkerIcon.generateMarker(requireContext()).position(
+                            LatLng(
+                                    it.latitude,
+                                    it.longitude
+                            )
                     )
-                )
             ).tag = it._id
         }
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+            requestCode: Int,
+            permissions: Array<out String>,
+            grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_LOCATION_PERMISSION) {
