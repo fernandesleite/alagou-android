@@ -80,4 +80,9 @@
             android:name="id"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/loginFragment2"
+        android:name="me.fernandesleite.alagou.ui.mainmap.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" />
 </navigation>

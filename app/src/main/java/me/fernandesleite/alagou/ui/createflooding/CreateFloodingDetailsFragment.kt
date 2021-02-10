@@ -41,7 +41,7 @@ class CreateFloodingDetailsFragment : Fragment() {
             NavHostFragment.findNavController(requireParentFragment())
         )
 
-        viewModel.latLong.observe(viewLifecycleOwner, Observer { fillLocalizacao(it, view) })
+        viewModel.latLong.observe(viewLifecycleOwner, { fillLocalizacao(it, view) })
 
         view.findViewById<Button>(R.id.btn_criar_ponto_alagamento)
             .setOnClickListener { createFloodingListener(view) }
@@ -62,7 +62,7 @@ class CreateFloodingDetailsFragment : Fragment() {
                 latLong.latitude,
                 latLong.longitude,
                 view.findViewById<TextInputEditText>(R.id.observacoes).text.toString(),
-                "test"
+                viewModel.getTokenId()
             )
         )
         NavHostFragment.findNavController(requireParentFragment())

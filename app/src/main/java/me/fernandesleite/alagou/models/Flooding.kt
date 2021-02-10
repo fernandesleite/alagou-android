@@ -4,7 +4,7 @@ data class FloodingPost(
     val latitude: Double,
     val longitude: Double,
     val note: String,
-    val user: String
+    val user: String?
 )
 
 data class Flooding(
@@ -12,5 +12,5 @@ data class Flooding(
     val latitude: Double,
     val longitude: Double,
     val note: String,
-    val user: String
+    val user: String?
 )

@@ -9,7 +9,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.*
 
-private const val BASE_URL = "http://192.168.15.3:8888/"
+private const val BASE_URL = "https://alagou-api.herokuapp.com/"
 
 private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
 

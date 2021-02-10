@@ -17,4 +17,6 @@
     <string name="ponto_de_alagamento">Ponto de alagamento</string>
     <string name="cancelar">Cancelar</string>
     <string name="salvar">Salvar</string>
+    <string name="alagou">Alagou!</string>
+    <string name="monitore_e_evite_alagamentos">Monitore e evite alagamentos</string>
 </resources>
