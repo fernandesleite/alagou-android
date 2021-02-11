@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
@@ -53,7 +52,7 @@ class DisplayFloodingInfoFragment : Fragment() {
             toolbar,
             NavHostFragment.findNavController(requireParentFragment())
         )
-        viewModel.flooding.observe(viewLifecycleOwner, Observer { showInfo(it, view) })
+        viewModel.flooding.observe(viewLifecycleOwner, { showInfo(it, view) })
     }
 
     override fun onResume() {
@@ -81,14 +80,18 @@ class DisplayFloodingInfoFragment : Fragment() {
             )
         )
         googleMap.uiSettings.setAllGesturesEnabled(false)
-        viewModel.flooding.observe(viewLifecycleOwner, Observer { moveCameraMap(it, googleMap) })
+        viewModel.flooding.observe(viewLifecycleOwner, { moveCameraMap(it, googleMap) })
     }
 
     private fun showInfo(flooding: Flooding, view: View) {
-        val geo = Geocoder(requireContext()).getFromLocation(flooding.latitude, flooding.longitude, 1)
+        val geo =
+            Geocoder(requireContext()).getFromLocation(flooding.latitude, flooding.longitude, 1)
         view.findViewById<TextView>(R.id.observacoes).text = flooding.note
+        view.findViewById<TextView>(R.id.criado_por).text =
+            getString(R.string.criado_por, flooding.user)
         view.findViewById<TextView>(R.id.address).text = geo[0].getAddressLine(0)
-        view.findViewById<LinearLayout>(R.id.rotas_container).setOnClickListener {callGoogleMaps(flooding)}
+        view.findViewById<LinearLayout>(R.id.rotas_container)
+            .setOnClickListener { callGoogleMaps(flooding) }
     }
 
     private fun callGoogleMaps(flooding: Flooding) {

@@ -8,14 +8,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textfield.TextInputEditText
 import me.fernandesleite.alagou.R
-import me.fernandesleite.alagou.models.Flooding
 import me.fernandesleite.alagou.models.FloodingPost
 import me.fernandesleite.alagou.util.LatLong
 
@@ -41,7 +39,7 @@ class CreateFloodingDetailsFragment : Fragment() {
             NavHostFragment.findNavController(requireParentFragment())
         )
 
-        viewModel.latLong.observe(viewLifecycleOwner, Observer { fillLocalizacao(it, view) })
+        viewModel.latLong.observe(viewLifecycleOwner, { fillLocalizacao(it, view) })
 
         view.findViewById<Button>(R.id.btn_criar_ponto_alagamento)
             .setOnClickListener { createFloodingListener(view) }
@@ -62,7 +60,7 @@ class CreateFloodingDetailsFragment : Fragment() {
                 latLong.latitude,
                 latLong.longitude,
                 view.findViewById<TextInputEditText>(R.id.observacoes).text.toString(),
-                "test"
+                viewModel.getTokenId()
             )
         )
         NavHostFragment.findNavController(requireParentFragment())
