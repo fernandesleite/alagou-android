@@ -16,14 +16,10 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
-import androidx.preference.PreferenceManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -90,21 +86,15 @@ class MapsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         val account = GoogleSignIn.getLastSignedInAccount(requireContext())
-        if(account == null) {
+        if (account == null) {
+            binding.btnCriarPonto.fabOptionEnabled = false
             navController.navigate(R.id.loginFragment2)
-        }
-        else {
+        } else {
+            binding.btnCriarPonto.fabOptionEnabled = true
             mapFragment?.getMapAsync(callback)
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        val account: GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(requireContext())
-        if(account == null) {
-            Log.i("MapsFragment", "Deu nulo conta google")
-        }
-    }
     // -------- Permission / Init ----------
 
     private fun enableLocation(map: GoogleMap): Boolean {
@@ -196,7 +186,7 @@ class MapsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if(this::map.isInitialized){
+        if (this::map.isInitialized) {
             getFloodingsInsideBounds()
         }
     }
@@ -207,12 +197,13 @@ class MapsFragment : Fragment() {
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         val mapView = mapFragment?.view
         // change My Location button from behind searchbar
-        val locationButton= (mapView?.findViewById<View>(Integer.parseInt("1"))?.parent as View).findViewById<View>(
-            Integer.parseInt(
-                "2"
+        val locationButton =
+            (mapView?.findViewById<View>(Integer.parseInt("1"))?.parent as View).findViewById<View>(
+                Integer.parseInt(
+                    "2"
+                )
             )
-        )
-        val rlp=locationButton.layoutParams as (RelativeLayout.LayoutParams)
+        val rlp = locationButton.layoutParams as (RelativeLayout.LayoutParams)
         rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
         rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0)
         rlp.setMargins(0, 250, 100, 0)
@@ -233,7 +224,7 @@ class MapsFragment : Fragment() {
             )
             true
         }
-        map.setOnCameraIdleListener {getFloodingsInsideBounds()}
+        map.setOnCameraIdleListener { getFloodingsInsideBounds() }
         viewModel.floodings.observe(viewLifecycleOwner, { addMaker(it) })
     }
 

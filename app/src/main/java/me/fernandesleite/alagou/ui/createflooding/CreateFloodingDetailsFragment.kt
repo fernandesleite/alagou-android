@@ -8,14 +8,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textfield.TextInputEditText
 import me.fernandesleite.alagou.R
-import me.fernandesleite.alagou.models.Flooding
 import me.fernandesleite.alagou.models.FloodingPost
 import me.fernandesleite.alagou.util.LatLong
 

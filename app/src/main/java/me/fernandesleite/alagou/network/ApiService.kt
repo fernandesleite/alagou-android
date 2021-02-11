@@ -4,6 +4,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import me.fernandesleite.alagou.models.Flooding
 import me.fernandesleite.alagou.models.FloodingPost
+import me.fernandesleite.alagou.models.User
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -32,6 +33,9 @@ interface ApiService {
 
     @GET("floodings/{id}")
     fun getFlooding(@Path("id") id: String): Call<Flooding>
+
+    @POST("user")
+    fun createUser(@Body user: User): Call<User>
 }
 
 object Api {
