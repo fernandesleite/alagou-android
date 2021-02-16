@@ -1,80 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ui.mainmap.DisplayFloodingInfoFragment">
-
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/rotas_layout"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="vModel"
+            type="me.fernandesleite.alagou.ui.mainmap.MapsViewModel" />
+    </data>
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginVertical="16dp">
+        android:orientation="vertical"
+        tools:context=".ui.mainmap.DisplayFloodingInfoFragment">
 
-        <TextView
-            android:id="@+id/address"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/FontTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/criado_por"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@+id/rotas_container"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/address"
-            app:layout_constraintVertical_bias="0.00999999" />
-
-        <TextView
-            android:id="@+id/observacoes"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/rotas_container"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/criado_por"
-            app:layout_constraintVertical_bias="0.050000012" />
-
-        <LinearLayout
-            android:id="@+id/rotas_container"
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#E6F7FB"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.57">
+            android:fitsSystemWindows="true" />
 
-            <com.google.android.gms.maps.MapView
-                android:id="@+id/miniMap"
-                android:layout_width="match_parent"
-                android:layout_height="200dp" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/rotas_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginVertical="16dp">
 
             <TextView
-                android:id="@+id/ver_rotas"
+                android:id="@+id/address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/FontTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/criado_por"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{@string/criado_por(vModel.flooding.user)}"
+                app:layout_constraintBottom_toTopOf="@+id/rotas_container"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/address"
+                app:layout_constraintVertical_bias="0.00999999" />
+
+            <TextView
+                android:id="@+id/observacoes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{vModel.flooding.note}"
+                app:layout_constraintBottom_toTopOf="@id/rotas_container"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/criado_por"
+                app:layout_constraintVertical_bias="0.050000012" />
+
+            <LinearLayout
+                android:id="@+id/rotas_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingVertical="16dp"
-                android:text="@string/ver_rotas_no_google_maps"
-                android:textAlignment="center"
-                android:textAppearance="@style/FontTitle"
-                android:textSize="16sp" />
-        </LinearLayout>
+                android:background="#E6F7FB"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.57">
+
+                <com.google.android.gms.maps.MapView
+                    android:id="@+id/miniMap"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp" />
+
+                <TextView
+                    android:id="@+id/ver_rotas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="16dp"
+                    android:text="@string/ver_rotas_no_google_maps"
+                    android:textAlignment="center"
+                    android:textAppearance="@style/FontTitle"
+                    android:textSize="16sp" />
+            </LinearLayout>
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-</LinearLayout>
+    </LinearLayout>
+</layout>

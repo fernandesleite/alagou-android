@@ -59,15 +59,6 @@
         android:name="me.fernandesleite.alagou.ui.createflooding.CreateFloodingDetailsFragment"
         android:label="Informe os dados"
         tools:layout="@layout/fragment_create_flooding_details" >
-        <argument
-            android:name="latitude"
-            app:argType="float" />
-        <argument
-            android:name="longitude"
-            app:argType="float" />
-        <argument
-            android:name="zoom"
-            app:argType="float" />
         <action
             android:id="@+id/action_createFloodingDetailsFragment_to_mapsFragment"
             app:destination="@id/mapsFragment"

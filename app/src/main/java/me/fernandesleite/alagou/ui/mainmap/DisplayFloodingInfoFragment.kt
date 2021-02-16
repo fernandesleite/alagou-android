@@ -19,8 +19,8 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.material.appbar.MaterialToolbar
 import me.fernandesleite.alagou.R
+import me.fernandesleite.alagou.databinding.FragmentDisplayFloodingInfoBinding
 import me.fernandesleite.alagou.models.Flooding
 import me.fernandesleite.alagou.util.GenerateMarkerIcon
 
@@ -28,46 +28,47 @@ import me.fernandesleite.alagou.util.GenerateMarkerIcon
 class DisplayFloodingInfoFragment : Fragment() {
 
     private lateinit var viewModel: MapsViewModel
-    private lateinit var miniMap: MapView
+    private lateinit var mMiniMap: MapView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val args = DisplayFloodingInfoFragmentArgs.fromBundle(requireArguments())
+    ): View {
         viewModel = ViewModelProvider(this).get(MapsViewModel::class.java)
-        viewModel.getFlooding(args.id)
-        val view = inflater.inflate(R.layout.fragment_display_flooding_info, container, false)
-        miniMap = view.findViewById<MapView>(R.id.miniMap)
-        miniMap.onCreate(savedInstanceState)
-        miniMap.onResume()
-        miniMap.getMapAsync(callback)
-        return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
-        NavigationUI.setupWithNavController(
-            toolbar,
-            NavHostFragment.findNavController(requireParentFragment())
-        )
-        viewModel.flooding.observe(viewLifecycleOwner, { showInfo(it, view) })
+        val binding = FragmentDisplayFloodingInfoBinding.inflate(inflater)
+        binding.vModel = viewModel
+        binding.lifecycleOwner = this
+        binding.apply {
+            mMiniMap = miniMap
+            miniMap.onCreate(savedInstanceState)
+            miniMap.onResume()
+            miniMap.getMapAsync(callback)
+            NavigationUI.setupWithNavController(
+                toolbar,
+                NavHostFragment.findNavController(requireParentFragment())
+            )
+            val args = DisplayFloodingInfoFragmentArgs.fromBundle(requireArguments())
+            viewModel.getFlooding(args.id)
+            viewModel.flooding.observe(
+                viewLifecycleOwner,
+                { showInfo(it, address, rotasContainer) })
+        }
+        return binding.root
     }
 
     override fun onResume() {
         super.onResume()
-        miniMap.onResume()
+        mMiniMap.onResume()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        miniMap.onDestroy()
+        mMiniMap.onDestroy()
     }
 
     override fun onPause() {
         super.onPause()
-        miniMap.onPause()
+        mMiniMap.onPause()
     }
 
     // --------- Callbacks ----------
@@ -83,14 +84,15 @@ class DisplayFloodingInfoFragment : Fragment() {
         viewModel.flooding.observe(viewLifecycleOwner, { moveCameraMap(it, googleMap) })
     }
 
-    private fun showInfo(flooding: Flooding, view: View) {
+    private fun showInfo(
+        flooding: Flooding,
+        address: TextView,
+        rotasContainer: LinearLayout
+    ) {
         val geo =
             Geocoder(requireContext()).getFromLocation(flooding.latitude, flooding.longitude, 1)
-        view.findViewById<TextView>(R.id.observacoes).text = flooding.note
-        view.findViewById<TextView>(R.id.criado_por).text =
-            getString(R.string.criado_por, flooding.user)
-        view.findViewById<TextView>(R.id.address).text = geo[0].getAddressLine(0)
-        view.findViewById<LinearLayout>(R.id.rotas_container)
+        address.text = geo[0].getAddressLine(0)
+        rotasContainer
             .setOnClickListener { callGoogleMaps(flooding) }
     }
 

@@ -1,7 +1,6 @@
 package me.fernandesleite.alagou.models
 
-data class Flooding(
-    val _id: String,
+data class FloodingPost(
     val latitude: Double,
     val longitude: Double,
     val note: String,

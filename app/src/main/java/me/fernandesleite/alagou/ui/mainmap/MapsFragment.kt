@@ -12,7 +12,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.RelativeLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -33,6 +35,8 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
+import com.google.android.material.bottomappbar.BottomAppBar
+import com.nambimobile.widgets.efab.FabOption
 import me.fernandesleite.alagou.R
 import me.fernandesleite.alagou.databinding.FragmentMapsBinding
 import me.fernandesleite.alagou.models.Flooding
@@ -44,7 +48,6 @@ class MapsFragment : Fragment() {
     private val REQUEST_LOCATION_PERMISSION = 1
     private var startedUp = true
     private lateinit var map: GoogleMap
-    private lateinit var binding: FragmentMapsBinding
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private lateinit var viewModel: MapsViewModel
     private lateinit var navController: NavController
@@ -56,9 +59,7 @@ class MapsFragment : Fragment() {
     ): View {
         viewModel = ViewModelProvider(this).get(MapsViewModel::class.java)
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-        binding = FragmentMapsBinding.inflate(inflater)
-
-
+        val binding = FragmentMapsBinding.inflate(inflater)
         Places.initialize(requireContext(), resources.getString(R.string.google_maps_api_key))
         val autocompleteFragment =
             childFragmentManager.findFragmentById(R.id.autocomplete_fragment)
@@ -75,25 +76,21 @@ class MapsFragment : Fragment() {
 
         })
 
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+        val account = GoogleSignIn.getLastSignedInAccount(requireContext())
         binding.apply {
             lifecycleOwner = this@MapsFragment
             btnCriarPonto.setOnClickListener { navigateToFragment(Directions.PONTO_ALAGAMENTO) }
             btnCriarPoi.setOnClickListener { navigateToFragment(Directions.AREA_DE_INTERESSE) }
-            btnTraffic.setOnClickListener { toggleTrafego() }
+            btnTraffic.setOnClickListener { toggleTrafego(btnTraffic) }
+            if (account == null) {
+                btnCriarPonto.fabOptionEnabled = false
+                navController.navigate(R.id.loginFragment2)
+            } else {
+                btnCriarPonto.fabOptionEnabled = true
+                mapFragment?.getMapAsync(callback(bottomAppBarText))
+            }
             return root
-        }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        val account = GoogleSignIn.getLastSignedInAccount(requireContext())
-        if (account == null) {
-            binding.btnCriarPonto.fabOptionEnabled = false
-            navController.navigate(R.id.loginFragment2)
-        } else {
-            binding.btnCriarPonto.fabOptionEnabled = true
-            mapFragment?.getMapAsync(callback)
         }
     }
 
@@ -148,14 +145,12 @@ class MapsFragment : Fragment() {
                             enableLocation(map)
                             service.removeUpdates(this)
                         }
-
                         override fun onStatusChanged(
                             provider: String?,
                             status: Int,
                             extras: Bundle?
                         ) {
                         }
-
                         override fun onProviderEnabled(provider: String?) {}
                         override fun onProviderDisabled(provider: String?) {}
                     }
@@ -195,7 +190,7 @@ class MapsFragment : Fragment() {
 
     // --------- Callbacks ----------
 
-    private val callback = OnMapReadyCallback { googleMap ->
+    private fun callback(bottomAppBarText: TextView) = OnMapReadyCallback { googleMap ->
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         val mapView = mapFragment?.view
         // change My Location button from behind searchbar
@@ -227,7 +222,7 @@ class MapsFragment : Fragment() {
             true
         }
         map.setOnCameraIdleListener { getFloodingsInsideBounds() }
-        viewModel.floodings.observe(viewLifecycleOwner, { addMaker(it) })
+        viewModel.floodings.observe(viewLifecycleOwner, { addMaker(it, bottomAppBarText) })
     }
 
     private fun getFloodingsInsideBounds() {
@@ -237,7 +232,6 @@ class MapsFragment : Fragment() {
         val boundsMinLat = bounds.southwest.latitude
         val boundsMinLng = bounds.southwest.longitude
         viewModel.getFloodings(boundsMinLat, boundsMaxLat, boundsMinLng, boundsMaxLng)
-
     }
 
     private fun navigateToFragment(direction: Directions) {
@@ -262,24 +256,24 @@ class MapsFragment : Fragment() {
         }
     }
 
-    private fun toggleTrafego() {
+    private fun toggleTrafego(btnTraffic: FabOption) {
         map.isTrafficEnabled = !map.isTrafficEnabled
         if (map.isTrafficEnabled) {
-            binding.btnTraffic.label.labelText = "Tráfego ativado"
-            binding.btnTraffic.fabOptionColor =
+            btnTraffic.label.labelText = "Tráfego ativado"
+            btnTraffic.fabOptionColor =
                 ContextCompat.getColor(requireContext(), R.color.active)
         } else {
-            binding.btnTraffic.label.labelText = "Tráfego desativado"
-            binding.btnTraffic.fabOptionColor =
+            btnTraffic.label.labelText = "Tráfego desativado"
+            btnTraffic.fabOptionColor =
                 ContextCompat.getColor(requireContext(), R.color.colorAccent)
         }
     }
 
-    private fun addMaker(floodings: List<Flooding>) {
+    private fun addMaker(floodings: List<Flooding>, bottomAppBarText: TextView) {
         if (floodings.isEmpty()) {
-            binding.bottomAppBarText.text = getString(R.string.quantityFloodingsPlaceholder_Zero)
+            bottomAppBarText.text = getString(R.string.quantityFloodingsPlaceholder_Zero)
         } else {
-            binding.bottomAppBarText.text = resources.getQuantityString(
+            bottomAppBarText.text = resources.getQuantityString(
                 R.plurals.quantityFloodingsPlaceholder,
                 floodings.size,
                 floodings.size

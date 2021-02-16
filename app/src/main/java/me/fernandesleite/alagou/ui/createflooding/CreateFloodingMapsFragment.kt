@@ -20,6 +20,7 @@ import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.material.appbar.MaterialToolbar
 import me.fernandesleite.alagou.R
+import me.fernandesleite.alagou.databinding.FragmentCreateFloodingMapsBinding
 import me.fernandesleite.alagou.util.GenerateMarkerIcon
 
 
@@ -29,32 +30,27 @@ class CreateFloodingMapsFragment : Fragment() {
     private lateinit var marker: Marker
     private lateinit var map: GoogleMap
     private lateinit var navController: NavController
-    private lateinit var toolbar: MaterialToolbar
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
         viewModel = ViewModelProvider(requireActivity()).get(CreateFloodingViewModel::class.java)
-        return inflater.inflate(R.layout.fragment_create_flooding_maps, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
-        NavigationUI.setupWithNavController(
-            toolbar,
-            NavHostFragment.findNavController(requireParentFragment())
-        )
-
-        toolbar.setOnMenuItemClickListener {
-            menuListenerSaveCancel(it)
+        val binding = FragmentCreateFloodingMapsBinding.inflate(inflater)
+        binding.apply {
+            NavigationUI.setupWithNavController(
+                toolbar,
+                NavHostFragment.findNavController(requireParentFragment())
+            )
+            toolbar.setOnMenuItemClickListener {
+                menuListenerSaveCancel(it, toolbar)
+            }
+            val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+            mapFragment?.getMapAsync(callback(toolbar))
         }
-
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        mapFragment?.getMapAsync(callback)
+        return binding.root
     }
 
     override fun onDestroyView() {
@@ -67,7 +63,7 @@ class CreateFloodingMapsFragment : Fragment() {
 
     // --------- Callbacks ----------
 
-    private val callback = OnMapReadyCallback { googleMap ->
+    private fun callback(toolbar: MaterialToolbar) = OnMapReadyCallback { googleMap ->
         googleMap.setMapStyle(
             MapStyleOptions.loadRawResourceStyle(
                 requireContext(),
@@ -78,14 +74,14 @@ class CreateFloodingMapsFragment : Fragment() {
         val args = CreateFloodingMapsFragmentArgs.fromBundle(requireArguments())
         val latLng = LatLng(args.latitude.toDouble(), args.longitude.toDouble())
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, args.zoom))
-        setMapClick(googleMap)
+        setMapClick(googleMap, toolbar)
     }
 
-    private fun menuListenerSaveCancel(it: MenuItem): Boolean {
+    private fun menuListenerSaveCancel(it: MenuItem, toolbar: MaterialToolbar): Boolean {
         when (it.itemId) {
             R.id.action_cancel -> {
                 marker.remove()
-                setMapClick(map)
+                setMapClick(map, toolbar)
                 map.uiSettings.isScrollGesturesEnabled = true
                 toolbar.menu.clear()
                 toolbar.setNavigationIcon(R.drawable.quantum_ic_arrow_back_grey600_24)
@@ -102,7 +98,7 @@ class CreateFloodingMapsFragment : Fragment() {
         }
     }
 
-    private fun setMapClick(map: GoogleMap) {
+    private fun setMapClick(map: GoogleMap, toolbar: MaterialToolbar) {
         map.setOnMapClickListener { latLng ->
             marker = map.addMarker(
                 GenerateMarkerIcon.generateMarker(requireContext())
@@ -125,12 +121,6 @@ class CreateFloodingMapsFragment : Fragment() {
     }
 
     private fun navigateToDetails() {
-        navController.navigate(
-            CreateFloodingMapsFragmentDirections.actionCreateFloodingMapsFragmentToCreateFloodingDetailsFragment(
-                marker.position.latitude.toFloat(),
-                marker.position.longitude.toFloat(),
-                map.cameraPosition.zoom
-            )
-        )
+        navController.navigate(R.id.createFloodingDetailsFragment)
     }
 }

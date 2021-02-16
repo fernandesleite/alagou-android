@@ -5,15 +5,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
-import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textfield.TextInputEditText
 import me.fernandesleite.alagou.R
+import me.fernandesleite.alagou.databinding.FragmentCreateFloodingDetailsBinding
 import me.fernandesleite.alagou.models.FloodingPost
 import me.fernandesleite.alagou.util.LatLong
 
@@ -25,41 +24,34 @@ class CreateFloodingDetailsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+        val binding = FragmentCreateFloodingDetailsBinding.inflate(inflater)
         viewModel = ViewModelProvider(requireActivity()).get(CreateFloodingViewModel::class.java)
-        return inflater.inflate(R.layout.fragment_create_flooding_details, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
-
-        NavigationUI.setupWithNavController(
-            toolbar,
-            NavHostFragment.findNavController(requireParentFragment())
-        )
-
-        viewModel.latLong.observe(viewLifecycleOwner, { fillLocalizacao(it, view) })
-
-        view.findViewById<Button>(R.id.btn_criar_ponto_alagamento)
-            .setOnClickListener { createFloodingListener(view) }
+        binding.apply {
+            NavigationUI.setupWithNavController(
+                toolbar,
+                NavHostFragment.findNavController(requireParentFragment())
+            )
+            viewModel.latLong.observe(viewLifecycleOwner, { fillLocalizacao(it, localizacao) })
+            btnCriarPontoAlagamento.setOnClickListener { createFloodingListener(observacoes) }
+        }
+        return binding.root
     }
 
     // --------- Callbacks ----------
 
-    private fun fillLocalizacao(it: LatLong, view: View) {
-        val localizacaoText = view.findViewById<TextView>(R.id.localizacao)
+    private fun fillLocalizacao(it: LatLong, localizacao: TextView) {
         val geo = Geocoder(requireContext()).getFromLocation(it.latitude, it.longitude, 10)
-        localizacaoText.text = geo[0].getAddressLine(0)
+        localizacao.text = geo[0].getAddressLine(0)
         latLong = it
     }
 
-    private fun createFloodingListener(view: View) {
+    private fun createFloodingListener(observacoes: TextInputEditText) {
         viewModel.createFlooding(
             FloodingPost(
                 latLong.latitude,
                 latLong.longitude,
-                view.findViewById<TextInputEditText>(R.id.observacoes).text.toString(),
+                observacoes.text.toString(),
                 viewModel.getTokenId()
             )
         )
