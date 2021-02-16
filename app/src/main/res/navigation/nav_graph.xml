@@ -23,6 +23,9 @@
         <action
             android:id="@+id/action_mapsFragment_to_displayFloodingInfoFragment"
             app:destination="@id/displayFloodingInfoFragment" />
+        <action
+            android:id="@+id/action_mapsFragment_to_createPOIFragment"
+            app:destination="@id/createPOIFragment" />
     </fragment>
     <fragment
         android:id="@+id/requestLocationFragment"
@@ -85,4 +88,19 @@
         android:name="me.fernandesleite.alagou.ui.mainmap.LoginFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" />
+    <fragment
+        android:id="@+id/createPOIFragment"
+        android:name="me.fernandesleite.alagou.ui.CreatePOIFragment"
+        android:label="Marque a área de interesse"
+        tools:layout="@layout/fragment_create_poi" >
+        <argument
+            android:name="latitude"
+            app:argType="float" />
+        <argument
+            android:name="longitude"
+            app:argType="float" />
+        <argument
+            android:name="zoom"
+            app:argType="float" />
+    </fragment>
 </navigation>

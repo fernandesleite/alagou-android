@@ -36,6 +36,7 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import me.fernandesleite.alagou.R
 import me.fernandesleite.alagou.databinding.FragmentMapsBinding
 import me.fernandesleite.alagou.models.Flooding
+import me.fernandesleite.alagou.util.Directions
 import me.fernandesleite.alagou.util.GenerateMarkerIcon
 
 class MapsFragment : Fragment() {
@@ -76,7 +77,8 @@ class MapsFragment : Fragment() {
 
         binding.apply {
             lifecycleOwner = this@MapsFragment
-            btnCriarPonto.setOnClickListener { navigateToCreateFloodingMap() }
+            btnCriarPonto.setOnClickListener { navigateToFragment(Directions.PONTO_ALAGAMENTO) }
+            btnCriarPoi.setOnClickListener { navigateToFragment(Directions.AREA_DE_INTERESSE) }
             btnTraffic.setOnClickListener { toggleTrafego() }
             return root
         }
@@ -238,14 +240,26 @@ class MapsFragment : Fragment() {
 
     }
 
-    private fun navigateToCreateFloodingMap() {
-        navController.navigate(
-            MapsFragmentDirections.actionMapsFragmentToCreateFloodingMapsFragment(
-                map.cameraPosition.target.latitude.toFloat(),
-                map.cameraPosition.target.longitude.toFloat(),
-                map.cameraPosition.zoom
+    private fun navigateToFragment(direction: Directions) {
+        val lat = map.cameraPosition.target.latitude.toFloat()
+        val lng = map.cameraPosition.target.longitude.toFloat()
+        val zoom = map.cameraPosition.zoom
+        when (direction) {
+            Directions.PONTO_ALAGAMENTO-> navController.navigate(
+                MapsFragmentDirections.actionMapsFragmentToCreateFloodingMapsFragment(
+                    lat,
+                    lng,
+                    zoom
+                )
             )
-        )
+            Directions.AREA_DE_INTERESSE -> navController.navigate(
+                MapsFragmentDirections.actionMapsFragmentToCreatePOIFragment(
+                    lat,
+                    lng,
+                    zoom
+                )
+            )
+        }
     }
 
     private fun toggleTrafego() {
