@@ -2,6 +2,7 @@ package me.fernandesleite.alagou.ui.mainmap
 
 import android.content.IntentSender
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,6 +51,7 @@ class RequestLocationFragment : Fragment() {
                 .checkLocationSettings(builder.build())
         result.addOnCompleteListener { task ->
             try {
+                task.getResult(ApiException::class.java)
             } catch (exception: ApiException) {
                 when (exception.statusCode) {
                     LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {

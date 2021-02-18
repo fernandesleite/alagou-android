@@ -12,7 +12,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -35,7 +34,6 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
-import com.google.android.material.bottomappbar.BottomAppBar
 import com.nambimobile.widgets.efab.FabOption
 import me.fernandesleite.alagou.R
 import me.fernandesleite.alagou.databinding.FragmentMapsBinding
@@ -46,9 +44,7 @@ import me.fernandesleite.alagou.util.GenerateMarkerIcon
 class MapsFragment : Fragment() {
 
     private val REQUEST_LOCATION_PERMISSION = 1
-    private var startedUp = true
     private lateinit var map: GoogleMap
-    private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private lateinit var viewModel: MapsViewModel
     private lateinit var navController: NavController
 
@@ -57,7 +53,7 @@ class MapsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewModel = ViewModelProvider(this).get(MapsViewModel::class.java)
+        viewModel = ViewModelProvider(requireActivity()).get(MapsViewModel::class.java)
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
         val binding = FragmentMapsBinding.inflate(inflater)
         Places.initialize(requireContext(), resources.getString(R.string.google_maps_api_key))
@@ -73,7 +69,6 @@ class MapsFragment : Fragment() {
             override fun onError(p0: Status) {
                 Log.i("TAG", "Place: $p0")
             }
-
         })
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
@@ -82,103 +77,16 @@ class MapsFragment : Fragment() {
             lifecycleOwner = this@MapsFragment
             btnCriarPonto.setOnClickListener { navigateToFragment(Directions.PONTO_ALAGAMENTO) }
             btnCriarPoi.setOnClickListener { navigateToFragment(Directions.AREA_DE_INTERESSE) }
-            btnTraffic.setOnClickListener { toggleTrafego(btnTraffic) }
+            btnTraffic.setOnClickListener { viewModel.toggleTraffic() }
             if (account == null) {
                 btnCriarPonto.fabOptionEnabled = false
                 navController.navigate(R.id.loginFragment2)
             } else {
                 btnCriarPonto.fabOptionEnabled = true
-                mapFragment?.getMapAsync(callback(bottomAppBarText))
+                mapFragment?.getMapAsync(callback(bottomAppBarText, btnTraffic))
             }
             return root
         }
-    }
-
-    // -------- Permission / Init ----------
-
-    private fun enableLocation(map: GoogleMap): Boolean {
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            if (startedUp) {
-                startUpLocationCamera(map)
-                map.isMyLocationEnabled = true
-                startedUp = !startedUp
-            }
-            return true
-        } else {
-            requestPermission()
-            return false
-        }
-
-    }
-
-    private fun requestPermission() {
-        requestPermissions(
-            arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
-            REQUEST_LOCATION_PERMISSION
-        )
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun startUpLocationCamera(map: GoogleMap) {
-        val service: LocationManager =
-            context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val enabled: Boolean = service
-            .isProviderEnabled(LocationManager.GPS_PROVIDER)
-        var currentLoc: Location?
-
-        if (enabled) {
-            mFusedLocationClient =
-                LocationServices.getFusedLocationProviderClient(requireActivity())
-            mFusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-                currentLoc = location
-                if (location != null) {
-                    moveCameraCurrentLocation(currentLoc)
-                    enableLocation(map)
-                } else {
-                    val locationListener = object : LocationListener {
-                        override fun onLocationChanged(currentLoc: Location?) {
-                            moveCameraCurrentLocation(currentLoc)
-                            enableLocation(map)
-                            service.removeUpdates(this)
-                        }
-                        override fun onStatusChanged(
-                            provider: String?,
-                            status: Int,
-                            extras: Bundle?
-                        ) {
-                        }
-                        override fun onProviderEnabled(provider: String?) {}
-                        override fun onProviderDisabled(provider: String?) {}
-                    }
-                    service.requestLocationUpdates(
-                        LocationManager.GPS_PROVIDER, 0,
-                        0f, locationListener
-                    )
-                }
-
-            }
-        } else {
-            navController.navigate(R.id.action_mapsFragment_to_requestLocationFragment)
-            Toast.makeText(activity, "Location Off", Toast.LENGTH_LONG).show()
-        }
-
-    }
-
-    private fun moveCameraCurrentLocation(currentLoc: Location?) {
-        val currentLocationLatLng = LatLng(
-            currentLoc!!.latitude,
-            currentLoc.longitude
-        )
-        map.moveCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                currentLocationLatLng,
-                15f
-            )
-        )
     }
 
     override fun onResume() {
@@ -188,42 +96,149 @@ class MapsFragment : Fragment() {
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.setCurrentPosition(map.cameraPosition.target)
+    }
+
+    // -------- Permission / Init ----------
+
+    private fun enableLocation(map: GoogleMap): Boolean {
+        return if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            map.isMyLocationEnabled = true
+            startUpLocationCamera()
+            true
+        } else {
+            requestPermission()
+            false
+        }
+    }
+
+    private fun requestPermission() {
+        requestPermissions(
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+            REQUEST_LOCATION_PERMISSION
+        )
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun lastLocationListener(location: Location?, service: LocationManager) {
+        if (location != null) {
+            viewModel.dataLoading.observe(viewLifecycleOwner, { loaded ->
+                if (!loaded) {
+                    moveCameraCurrentLocation(LatLng(location.latitude, location.longitude))
+                    enableLocation(map)
+                    viewModel.started()
+                } else {
+                    viewModel.currentPosition.observe(
+                        viewLifecycleOwner,
+                        { moveCameraCurrentLocation(it) })
+                }
+            })
+        } else {
+            val locationListener = object : LocationListener {
+                override fun onLocationChanged(location: Location?) {
+                    moveCameraCurrentLocation(LatLng(location!!.latitude, location.longitude))
+                    service.removeUpdates(this)
+                }
+
+                override fun onStatusChanged(
+                    provider: String?,
+                    status: Int,
+                    extras: Bundle?
+                ) {
+                }
+
+                override fun onProviderEnabled(provider: String?) {}
+                override fun onProviderDisabled(provider: String?) {}
+            }
+            service.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER, 0,
+                0f, locationListener
+            )
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun startUpLocationCamera() {
+        val service: LocationManager =
+            context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val enabled: Boolean = service
+            .isProviderEnabled(LocationManager.GPS_PROVIDER)
+        if (enabled) {
+            val mFusedLocationClient =
+                LocationServices.getFusedLocationProviderClient(requireActivity())
+            mFusedLocationClient.lastLocation.addOnSuccessListener {
+                lastLocationListener(
+                    it,
+                    service
+                )
+            }
+        } else {
+            navController.navigate(R.id.action_mapsFragment_to_requestLocationFragment)
+            Toast.makeText(activity, "Location Off", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_LOCATION_PERMISSION) {
+            if (grantResults.contains(PackageManager.PERMISSION_GRANTED)) {
+                enableLocation(map)
+            }
+        }
+    }
+
     // --------- Callbacks ----------
 
-    private fun callback(bottomAppBarText: TextView) = OnMapReadyCallback { googleMap ->
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        val mapView = mapFragment?.view
-        // change My Location button from behind searchbar
-        val locationButton =
-            (mapView?.findViewById<View>(Integer.parseInt("1"))?.parent as View).findViewById<View>(
-                Integer.parseInt(
-                    "2"
+    private fun callback(bottomAppBarText: TextView, btnTraffic: FabOption) =
+        OnMapReadyCallback { googleMap ->
+            val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+            val mapView = mapFragment?.view
+            // change My Location button from behind searchbar
+            val locationButton =
+                (mapView?.findViewById<View>(Integer.parseInt("1"))?.parent as View).findViewById<View>(
+                    Integer.parseInt(
+                        "2"
+                    )
                 )
-            )
-        val rlp = locationButton.layoutParams as (RelativeLayout.LayoutParams)
-        rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
-        rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0)
-        rlp.setMargins(0, 250, 100, 0)
+            val rlp = locationButton.layoutParams as (RelativeLayout.LayoutParams)
+            rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
+            rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0)
+            rlp.setMargins(0, 250, 100, 0)
 
-        googleMap.setMapStyle(
-            MapStyleOptions.loadRawResourceStyle(
-                requireContext(),
-                R.raw.map_style_main
-            )
-        )
-        map = googleMap
-        enableLocation(map)
-        map.setOnMarkerClickListener {
-            navController.navigate(
-                MapsFragmentDirections.actionMapsFragmentToDisplayFloodingInfoFragment(
-                    it.tag.toString()
+            googleMap.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                    requireContext(),
+                    R.raw.map_style_main
                 )
             )
-            true
+            map = googleMap
+            enableLocation(map)
+            map.setOnMarkerClickListener {
+                navController.navigate(
+                    MapsFragmentDirections.actionMapsFragmentToDisplayFloodingInfoFragment(
+                        it.tag.toString()
+                    )
+                )
+                true
+            }
+            map.setOnCameraIdleListener { getFloodingsInsideBounds() }
+            viewModel.floodings.observe(viewLifecycleOwner, { addMaker(it, bottomAppBarText) })
+
+            viewModel.trafficMap.observe(viewLifecycleOwner, {
+                toggleTrafego(it, btnTraffic)
+
+            })
         }
-        map.setOnCameraIdleListener { getFloodingsInsideBounds() }
-        viewModel.floodings.observe(viewLifecycleOwner, { addMaker(it, bottomAppBarText) })
-    }
 
     private fun getFloodingsInsideBounds() {
         val bounds = map.projection.visibleRegion.latLngBounds
@@ -239,7 +254,7 @@ class MapsFragment : Fragment() {
         val lng = map.cameraPosition.target.longitude.toFloat()
         val zoom = map.cameraPosition.zoom
         when (direction) {
-            Directions.PONTO_ALAGAMENTO-> navController.navigate(
+            Directions.PONTO_ALAGAMENTO -> navController.navigate(
                 MapsFragmentDirections.actionMapsFragmentToCreateFloodingMapsFragment(
                     lat,
                     lng,
@@ -256,16 +271,19 @@ class MapsFragment : Fragment() {
         }
     }
 
-    private fun toggleTrafego(btnTraffic: FabOption) {
-        map.isTrafficEnabled = !map.isTrafficEnabled
-        if (map.isTrafficEnabled) {
+    private fun toggleTrafego(isEnabled: Boolean, btnTraffic: FabOption) {
+        map.isTrafficEnabled = isEnabled
+        if (isEnabled) {
             btnTraffic.label.labelText = "Tráfego ativado"
             btnTraffic.fabOptionColor =
                 ContextCompat.getColor(requireContext(), R.color.active)
         } else {
             btnTraffic.label.labelText = "Tráfego desativado"
             btnTraffic.fabOptionColor =
-                ContextCompat.getColor(requireContext(), R.color.colorAccent)
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.colorAccent
+                )
         }
     }
 
@@ -292,16 +310,12 @@ class MapsFragment : Fragment() {
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_LOCATION_PERMISSION) {
-            if (grantResults.contains(PackageManager.PERMISSION_GRANTED)) {
-                enableLocation(map)
-            }
-        }
+    private fun moveCameraCurrentLocation(currentLoc: LatLng?) {
+        map.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                currentLoc,
+                15f
+            )
+        )
     }
 }
