@@ -81,7 +81,7 @@
         tools:layout="@layout/fragment_login" />
     <fragment
         android:id="@+id/createPOIFragment"
-        android:name="me.fernandesleite.alagou.ui.CreatePOIFragment"
+        android:name="me.fernandesleite.alagou.ui.createpoi.CreatePOIFragment"
         android:label="Marque a área de interesse"
         tools:layout="@layout/fragment_create_poi" >
         <argument

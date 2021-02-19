@@ -1,11 +1,13 @@
-package me.fernandesleite.alagou.ui
+package me.fernandesleite.alagou.ui.createpoi
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -15,6 +17,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.slider.Slider
+import kotlinx.android.synthetic.main.fragment_create_poi.*
 import me.fernandesleite.alagou.R
 import me.fernandesleite.alagou.databinding.FragmentCreatePoiBinding
 import me.fernandesleite.alagou.util.GenerateMarkerIcon
@@ -22,6 +25,7 @@ import me.fernandesleite.alagou.util.GenerateMarkerIcon
 class CreatePOIFragment : Fragment() {
 
     private lateinit var poi: Circle
+    private lateinit var viewModel: CreatePOIViewModel
     private lateinit var marker: Marker
     private var minRadius = 100.0
 
@@ -30,14 +34,14 @@ class CreatePOIFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        viewModel = ViewModelProvider(this).get(CreatePOIViewModel::class.java)
         val binding = FragmentCreatePoiBinding.inflate(inflater)
         binding.apply {
             NavigationUI.setupWithNavController(
                 toolbar,
                 NavHostFragment.findNavController(requireParentFragment())
             )
-            toolbar.setOnMenuItemClickListener(menuItemListener(toolbar, slider))
-            slider.addOnChangeListener(sliderListener())
+            toolbar.setOnMenuItemClickListener(menuItemListener(toolbar, sliderContainer))
             val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
             mapFragment?.getMapAsync(cb(this))
             return root
@@ -46,7 +50,8 @@ class CreatePOIFragment : Fragment() {
 
     private fun cb(binding: FragmentCreatePoiBinding) = OnMapReadyCallback { googleMap ->
         val args = CreatePOIFragmentArgs.fromBundle(requireArguments())
-        val latLng = LatLng(args.latitude.toDouble(), args.longitude.toDouble())
+        var latLng = LatLng(args.latitude.toDouble(), args.longitude.toDouble())
+        viewModel.currentMarkerPosition.observe(viewLifecycleOwner, {latLng = it ?: latLng})
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, args.zoom))
         googleMap.setMapStyle(
             MapStyleOptions.loadRawResourceStyle(
@@ -55,39 +60,48 @@ class CreatePOIFragment : Fragment() {
             )
         )
         googleMap.setOnMarkerDragListener(onDragListener())
+        googleMap.setOnMapClickListener {
+            viewModel.setCurrentMarkerPosition(it)
+            viewModel.setMarkerStatus()
+        }
         setMapClick(googleMap, binding)
-
     }
-    private fun onDragListener() = object: GoogleMap.OnMarkerDragListener{
+
+    private fun onDragListener() = object : GoogleMap.OnMarkerDragListener {
         override fun onMarkerDragStart(p0: Marker?) {}
         override fun onMarkerDrag(p0: Marker?) {
             if (p0 != null) {
-                poi.center = LatLng(p0.position.latitude, p0.position.longitude)
+               poi.center = LatLng(p0.position.latitude, p0.position.longitude)
             }
         }
-        override fun onMarkerDragEnd(p0: Marker?) {}
+
+        override fun onMarkerDragEnd(p0: Marker?) {
+            if (p0 != null) {
+                viewModel.setCurrentMarkerPosition(LatLng(p0.position.latitude, p0.position.longitude))
+            }
+        }
     }
 
-    private fun sliderListener() = Slider.OnChangeListener { slider, value, fromUser ->
+    private fun sliderListener() = Slider.OnChangeListener { _, value, _ ->
         minRadius = value.toDouble()
-        poi.radius = value.toDouble()
+        viewModel.setCurrentRadius(value.toDouble())
     }
 
     private fun menuItemListener(
         toolbar: MaterialToolbar,
-        slider: Slider
+        sliderContainer: LinearLayout
     ) = Toolbar.OnMenuItemClickListener {
         when (it.itemId) {
             R.id.action_cancel -> {
                 marker.remove()
                 poi.remove()
                 toolbar.menu.clear()
-                slider.visibility = View.GONE
+                viewModel.setMarkerStatus()
+                sliderContainer.visibility = View.GONE
                 toolbar.setNavigationIcon(R.drawable.quantum_ic_arrow_back_grey600_24)
                 true
             }
             R.id.action_salvar -> {
-
                 true
             }
             else -> {
@@ -97,30 +111,31 @@ class CreatePOIFragment : Fragment() {
     }
 
     private fun setMapClick(map: GoogleMap, binding: FragmentCreatePoiBinding) {
-        map.setOnMapClickListener { latLng ->
-            binding.toolbar.inflateMenu(R.menu.menu_confirm_flood)
-            if (this::marker.isInitialized) {
-                marker.remove()
-                poi.remove()
-            }
-            poi = map.addCircle(
-                CircleOptions().center(latLng).radius(minRadius).fillColor(0x55000000)
-            )
-            marker = map.addMarker(
-                GenerateMarkerIcon.generateMarker(requireContext())
-                    .position(latLng).draggable(true)
-            )
-            map.uiSettings.isScrollGesturesEnabled = false
-            map.animateCamera(
-                CameraUpdateFactory.newLatLng(
-                    LatLng(
-                        marker.position.latitude,
-                        marker.position.longitude
+        viewModel.markerActive.observe(viewLifecycleOwner, {
+            if(it){
+                viewModel.currentMarkerPosition.observe(viewLifecycleOwner, { latLng ->
+                    if (this::marker.isInitialized) {
+                        marker.remove()
+                        poi.remove()
+                    }
+                    poi = map.addCircle(
+                        CircleOptions().center(latLng).radius(minRadius).fillColor(0x55000000)
                     )
-                )
-            )
-            binding.slider.visibility = View.VISIBLE
-            poi.center = LatLng(marker.position.latitude, marker.position.longitude)
-        }
+                    viewModel.currentRadius.observe(viewLifecycleOwner, { poi.radius = it })
+                    marker = map.addMarker(
+                        GenerateMarkerIcon.generateMarker(requireContext())
+                            .position(latLng).draggable(true)
+                    )
+                    poi.center = LatLng(marker.position.latitude, marker.position.longitude)
+                    if(!binding.toolbar.menu.hasVisibleItems()){
+                        binding.toolbar.inflateMenu(R.menu.menu_confirm_flood)
+                        binding.toolbar.navigationIcon = null
+                    }
+                    binding.slider.addOnChangeListener(sliderListener())
+                    binding.sliderContainer.visibility = View.VISIBLE
+                })
+            }
+        })
+
     }
 }
