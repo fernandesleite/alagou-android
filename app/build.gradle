@@ -80,4 +80,8 @@ dependencies {
 
     implementation 'androidx.preference:preference:1.1.1'
 
+    implementation "androidx.room:room-runtime:2.2.6"
+    kapt "androidx.room:room-compiler:2.2.6"
+    implementation "androidx.room:room-ktx:2.2.6"
+
 }

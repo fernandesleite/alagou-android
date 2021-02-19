@@ -9,6 +9,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -17,7 +18,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.slider.Slider
-import kotlinx.android.synthetic.main.fragment_create_poi.*
 import me.fernandesleite.alagou.R
 import me.fernandesleite.alagou.databinding.FragmentCreatePoiBinding
 import me.fernandesleite.alagou.util.GenerateMarkerIcon
@@ -102,6 +102,8 @@ class CreatePOIFragment : Fragment() {
                 true
             }
             R.id.action_salvar -> {
+                viewModel.insertPoi(poi.center.latitude, poi.center.longitude, poi.radius)
+                findNavController().popBackStack()
                 true
             }
             else -> {
