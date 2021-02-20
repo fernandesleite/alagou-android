@@ -77,7 +77,11 @@ class MapsFragment : Fragment() {
             lifecycleOwner = this@MapsFragment
             btnCriarPonto.setOnClickListener { navigateToFragment(Directions.PONTO_ALAGAMENTO) }
             btnCriarPoi.setOnClickListener { navigateToFragment(Directions.AREA_DE_INTERESSE) }
+            navigation.getHeaderView(0).findViewById<TextView>(R.id.nome_usuario).text
             btnTraffic.setOnClickListener { viewModel.toggleTraffic() }
+            bottomAppBar.setNavigationOnClickListener {
+                drawerLayout.open()
+            }
             if (account == null) {
                 btnCriarPonto.fabOptionEnabled = false
                 navController.navigate(R.id.loginFragment2)
