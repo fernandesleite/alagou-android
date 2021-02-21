@@ -17,9 +17,19 @@ class UserRepository(val context: Context) {
 
     }
 
+    fun getUserNameToken(): String? {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+            .getString("nameToken", null)
+    }
+
+    fun getUserEmailToken(): String? {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+            .getString("emailToken", null)
+    }
+
     fun setTokenId(result: GoogleSignInAccount) {
         PreferenceManager.getDefaultSharedPreferences(context).edit()
-            .putString("idToken", result.idToken).apply()
+            .putString("idToken", result.idToken).putString("nameToken", result.displayName).putString("emailToken", result.email).apply()
     }
 
     fun createUser(user: User) {

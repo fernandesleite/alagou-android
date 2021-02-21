@@ -58,6 +58,12 @@ class MapsViewModel(application: Application) : AndroidViewModel(application) {
     fun createUser(user: User) {
         userRepository.createUser(user)
     }
+    fun getUserNameToken(): String?{
+        return userRepository.getUserNameToken()
+    }
+    fun getUserEmailToken(): String?{
+        return userRepository.getUserEmailToken()
+    }
     fun setCurrentPosition(latLng: LatLng) {
         _currentPosition.value = latLng
     }

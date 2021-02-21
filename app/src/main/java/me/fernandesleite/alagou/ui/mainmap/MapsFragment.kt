@@ -22,7 +22,6 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.Status
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -77,7 +76,8 @@ class MapsFragment : Fragment() {
             lifecycleOwner = this@MapsFragment
             btnCriarPonto.setOnClickListener { navigateToFragment(Directions.PONTO_ALAGAMENTO) }
             btnCriarPoi.setOnClickListener { navigateToFragment(Directions.AREA_DE_INTERESSE) }
-            navigation.getHeaderView(0).findViewById<TextView>(R.id.nome_usuario).text
+            headerNavigation.nomeUsuario.text = viewModel.getUserNameToken() ?: "Não Logado"
+            headerNavigation.emailUsuario.text = viewModel.getUserEmailToken() ?: ""
             btnTraffic.setOnClickListener { viewModel.toggleTraffic() }
             bottomAppBar.setNavigationOnClickListener {
                 drawerLayout.open()
@@ -102,7 +102,9 @@ class MapsFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        viewModel.setCurrentPosition(map.cameraPosition.target)
+        if (this::map.isInitialized) {
+            viewModel.setCurrentPosition(map.cameraPosition.target)
+        }
     }
 
     // -------- Permission / Init ----------

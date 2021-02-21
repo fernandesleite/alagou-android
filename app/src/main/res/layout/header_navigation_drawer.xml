@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="24dp">
+    android:layout_marginTop="12dp">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:layout_marginStart="12dp">
         <ImageView
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:contentDescription="@string/alagou"
             android:src="@drawable/icon"/>
         <TextView
             android:layout_width="wrap_content"
@@ -23,7 +28,22 @@
         android:id="@+id/nome_usuario"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/FontLabel"
+        android:fontFamily="@font/nunito_bold"
+        android:layout_marginTop="10dp"
         android:layout_marginStart="12dp"
-        android:text="@string/alagou"/>
+        android:maxLines="1"
+        tools:text="@tools:sample/full_names"/>
+    <TextView
+        android:id="@+id/email_usuario"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/nunito"
+        android:layout_marginStart="12dp"
+        android:maxLines="1"
+        tools:text="@tools:sample/lorem[3]"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="6dp"
+        android:background="#C1C1C1"/>
 </LinearLayout>
