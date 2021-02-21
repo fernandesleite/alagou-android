@@ -79,6 +79,15 @@ class MapsFragment : Fragment() {
             headerNavigation.nomeUsuario.text = viewModel.getUserNameToken() ?: "Não Logado"
             headerNavigation.emailUsuario.text = viewModel.getUserEmailToken() ?: ""
             btnTraffic.setOnClickListener { viewModel.toggleTraffic() }
+            val adapter = PoiAdapter()
+            poiList.adapter = adapter
+            viewModel.poiList.observe(viewLifecycleOwner, { list ->
+                adapter.submitList(list)
+                list.forEach {
+                    Log.i("MapsFragment", it.id.toString())
+                }
+
+            })
             bottomAppBar.setNavigationOnClickListener {
                 drawerLayout.open()
             }

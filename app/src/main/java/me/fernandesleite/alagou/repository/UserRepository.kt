@@ -14,7 +14,6 @@ class UserRepository(val context: Context) {
     fun getTokenId(): String? {
         return PreferenceManager.getDefaultSharedPreferences(context)
             .getString("idToken", "DEFAULT")
-
     }
 
     fun getUserNameToken(): String? {
