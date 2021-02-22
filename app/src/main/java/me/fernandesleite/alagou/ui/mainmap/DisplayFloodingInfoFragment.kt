@@ -112,7 +112,7 @@ class DisplayFloodingInfoFragment : Fragment() {
         )
         googleMap.moveCamera(cameraUpdate)
         googleMap.addMarker(
-            GenerateMarkerIcon.generateMarker(requireContext())
+            GenerateMarkerIcon.generateMarker(requireContext(), R.drawable.ic_marker)
                 .position(LatLng(it.latitude, it.longitude))
         )
     }

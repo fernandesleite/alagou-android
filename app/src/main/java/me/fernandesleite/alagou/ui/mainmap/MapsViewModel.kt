@@ -1,7 +1,6 @@
 package me.fernandesleite.alagou.ui.mainmap
 
 import android.app.Application
-import android.location.Location
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -21,7 +20,8 @@ class MapsViewModel(application: Application) : AndroidViewModel(application) {
 
     private val floodingRepository = FloodingRepository()
     private val userRepository = UserRepository(application.applicationContext)
-    private val poiRepository = PoiRepository(PoiDatabase.getInstance(application.applicationContext))
+    private val poiRepository =
+        PoiRepository(PoiDatabase.getInstance(application.applicationContext))
 
     private val _currentPosition = MutableLiveData<LatLng>()
     val currentPosition: LiveData<LatLng>
@@ -74,12 +74,15 @@ class MapsViewModel(application: Application) : AndroidViewModel(application) {
     fun createUser(user: User) {
         userRepository.createUser(user)
     }
-    fun getUserNameToken(): String?{
+
+    fun getUserNameToken(): String? {
         return userRepository.getUserNameToken()
     }
-    fun getUserEmailToken(): String?{
+
+    fun getUserEmailToken(): String? {
         return userRepository.getUserEmailToken()
     }
+
     fun setCurrentPosition(latLng: LatLng) {
         _currentPosition.value = latLng
     }

@@ -27,8 +27,6 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.Circle
-import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.libraries.places.api.Places
@@ -41,6 +39,7 @@ import me.fernandesleite.alagou.databinding.FragmentMapsBinding
 import me.fernandesleite.alagou.models.Flooding
 import me.fernandesleite.alagou.persistence.Poi
 import me.fernandesleite.alagou.util.Directions
+import me.fernandesleite.alagou.util.GenerateCirclePoi
 import me.fernandesleite.alagou.util.GenerateMarkerIcon
 
 class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
@@ -56,7 +55,7 @@ class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewModel = ViewModelProvider(this).get(MapsViewModel::class.java)
+        viewModel = ViewModelProvider(requireActivity()).get(MapsViewModel::class.java)
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
         binding = FragmentMapsBinding.inflate(inflater)
         Places.initialize(requireContext(), resources.getString(R.string.google_maps_api_key))
@@ -87,12 +86,7 @@ class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
             btnTraffic.setOnClickListener { viewModel.toggleTraffic() }
             poiList.adapter = adapter
             viewModel.refreshPoiCache()
-            viewModel.poiList.observe(viewLifecycleOwner, { list ->
-                adapter.submitList(list)
-                list.forEach {
-                    Log.i("MapsFragment", it.id.toString())
-                }
-            })
+            viewModel.poiList.observe(viewLifecycleOwner, { adapter.submitList(it) })
             bottomAppBar.setNavigationOnClickListener {
                 drawerLayout.open()
             }
@@ -106,6 +100,7 @@ class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
             return root
         }
     }
+
     override fun onResume() {
         super.onResume()
         if (this::map.isInitialized) {
@@ -118,6 +113,7 @@ class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
         if (this::map.isInitialized) {
             viewModel.setCurrentPosition(map.cameraPosition.target)
         }
+        map.clear()
     }
     // -------- Permission / Init ----------
 
@@ -255,13 +251,7 @@ class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
             viewModel.trafficMap.observe(viewLifecycleOwner, {
                 toggleTrafego(it, btnTraffic)
             })
-
-            viewModel.poiList.observe(viewLifecycleOwner, {
-                it.forEach { poi ->
-
-                }
-
-            })
+            viewModel.poiList.observe(viewLifecycleOwner, { addCircle(it) })
         }
 
     private fun getFloodingsInsideBounds() {
@@ -321,16 +311,31 @@ class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
                 floodings.size
             )
         }
-
         floodings.forEach {
             map.addMarker(
-                GenerateMarkerIcon.generateMarker(requireContext()).position(
+                GenerateMarkerIcon.generateMarker(requireContext(), R.drawable.ic_marker).position(
                     LatLng(
                         it.latitude,
                         it.longitude
                     )
                 )
             ).tag = it._id
+        }
+    }
+
+    private fun addCircle(list: List<Poi>) {
+        map.let {
+            it.clear()
+            list.forEach { poi ->
+                val latLng = LatLng(poi.lat, poi.lng)
+                it.addCircle(GenerateCirclePoi.generateCircle(latLng, poi.radius))
+                it.addMarker(
+                    GenerateMarkerIcon.generateMarker(
+                        requireContext(),
+                        R.drawable.ic_priority_high_red_48dp
+                    ).position(latLng)
+                )
+            }
         }
     }
 
@@ -347,6 +352,5 @@ class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
         val latLng = LatLng(poi.lat, poi.lng)
         map.animateCamera(CameraUpdateFactory.newLatLng(latLng))
         binding.drawerLayout.close()
-        Log.i("MapsFragment", "Clicado")
     }
 }

@@ -1,12 +1,9 @@
 package me.fernandesleite.alagou.ui.createpoi
 
-import android.app.Activity
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
@@ -19,11 +16,15 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.Circle
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.gms.maps.model.Marker
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.slider.Slider
 import me.fernandesleite.alagou.R
 import me.fernandesleite.alagou.databinding.FragmentCreatePoiBinding
+import me.fernandesleite.alagou.util.GenerateCirclePoi
 import me.fernandesleite.alagou.util.GenerateMarkerIcon
 
 class CreatePOIFragment : Fragment(), PoiDialogFragment.PoiDialogListener {
@@ -55,7 +56,7 @@ class CreatePOIFragment : Fragment(), PoiDialogFragment.PoiDialogListener {
     private fun cb(binding: FragmentCreatePoiBinding) = OnMapReadyCallback { googleMap ->
         val args = CreatePOIFragmentArgs.fromBundle(requireArguments())
         var latLng = LatLng(args.latitude.toDouble(), args.longitude.toDouble())
-        viewModel.currentMarkerPosition.observe(viewLifecycleOwner, {latLng = it ?: latLng})
+        viewModel.currentMarkerPosition.observe(viewLifecycleOwner, { latLng = it ?: latLng })
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, args.zoom))
         googleMap.setMapStyle(
             MapStyleOptions.loadRawResourceStyle(
@@ -75,13 +76,18 @@ class CreatePOIFragment : Fragment(), PoiDialogFragment.PoiDialogListener {
         override fun onMarkerDragStart(p0: Marker?) {}
         override fun onMarkerDrag(p0: Marker?) {
             if (p0 != null) {
-               poi.center = LatLng(p0.position.latitude, p0.position.longitude)
+                poi.center = LatLng(p0.position.latitude, p0.position.longitude)
             }
         }
 
         override fun onMarkerDragEnd(p0: Marker?) {
             if (p0 != null) {
-                viewModel.setCurrentMarkerPosition(LatLng(p0.position.latitude, p0.position.longitude))
+                viewModel.setCurrentMarkerPosition(
+                    LatLng(
+                        p0.position.latitude,
+                        p0.position.longitude
+                    )
+                )
             }
         }
     }
@@ -107,7 +113,7 @@ class CreatePOIFragment : Fragment(), PoiDialogFragment.PoiDialogListener {
             }
             R.id.action_salvar -> {
                 val dialog = PoiDialogFragment()
-                dialog.setTargetFragment(this,0)
+                dialog.setTargetFragment(this, 0)
                 dialog.show(parentFragmentManager, "PoiDialogFragment")
                 true
             }
@@ -119,22 +125,23 @@ class CreatePOIFragment : Fragment(), PoiDialogFragment.PoiDialogListener {
 
     private fun setMapClick(map: GoogleMap, binding: FragmentCreatePoiBinding) {
         viewModel.markerActive.observe(viewLifecycleOwner, {
-            if(it){
+            if (it) {
                 viewModel.currentMarkerPosition.observe(viewLifecycleOwner, { latLng ->
                     if (this::marker.isInitialized) {
                         marker.remove()
                         poi.remove()
                     }
-                    poi = map.addCircle(
-                        CircleOptions().center(latLng).radius(minRadius).fillColor(0x55000000)
-                    )
+                    poi = map.addCircle(GenerateCirclePoi.generateCircle(latLng, minRadius))
                     viewModel.currentRadius.observe(viewLifecycleOwner, { poi.radius = it })
                     marker = map.addMarker(
-                        GenerateMarkerIcon.generateMarker(requireContext())
+                        GenerateMarkerIcon.generateMarker(
+                            requireContext(),
+                            R.drawable.ic_priority_high_red_48dp
+                        )
                             .position(latLng).draggable(true)
                     )
                     poi.center = LatLng(marker.position.latitude, marker.position.longitude)
-                    if(!binding.toolbar.menu.hasVisibleItems()){
+                    if (!binding.toolbar.menu.hasVisibleItems()) {
                         binding.toolbar.inflateMenu(R.menu.menu_confirm_flood)
                         binding.toolbar.navigationIcon = null
                     }

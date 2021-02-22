@@ -101,7 +101,7 @@ class CreateFloodingMapsFragment : Fragment() {
     private fun setMapClick(map: GoogleMap, toolbar: MaterialToolbar) {
         map.setOnMapClickListener { latLng ->
             marker = map.addMarker(
-                GenerateMarkerIcon.generateMarker(requireContext())
+                GenerateMarkerIcon.generateMarker(requireContext(), R.drawable.ic_marker)
                     .position(latLng)
             )
             map.uiSettings.isScrollGesturesEnabled = false

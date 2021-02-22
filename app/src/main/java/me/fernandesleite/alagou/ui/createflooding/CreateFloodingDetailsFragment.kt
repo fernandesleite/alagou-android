@@ -10,16 +10,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.textfield.TextInputEditText
 import me.fernandesleite.alagou.R
 import me.fernandesleite.alagou.databinding.FragmentCreateFloodingDetailsBinding
 import me.fernandesleite.alagou.models.FloodingPost
-import me.fernandesleite.alagou.util.LatLong
 
 class CreateFloodingDetailsFragment : Fragment() {
 
     private lateinit var viewModel: CreateFloodingViewModel
-    private lateinit var latLong: LatLong
+    private lateinit var latLong: LatLng
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,7 +40,7 @@ class CreateFloodingDetailsFragment : Fragment() {
 
     // --------- Callbacks ----------
 
-    private fun fillLocalizacao(it: LatLong, localizacao: TextView) {
+    private fun fillLocalizacao(it: LatLng, localizacao: TextView) {
         val geo = Geocoder(requireContext()).getFromLocation(it.latitude, it.longitude, 10)
         localizacao.text = geo[0].getAddressLine(0)
         latLong = it
