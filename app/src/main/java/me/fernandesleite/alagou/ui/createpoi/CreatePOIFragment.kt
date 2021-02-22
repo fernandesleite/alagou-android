@@ -1,11 +1,15 @@
 package me.fernandesleite.alagou.ui.createpoi
 
+import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
@@ -22,7 +26,7 @@ import me.fernandesleite.alagou.R
 import me.fernandesleite.alagou.databinding.FragmentCreatePoiBinding
 import me.fernandesleite.alagou.util.GenerateMarkerIcon
 
-class CreatePOIFragment : Fragment() {
+class CreatePOIFragment : Fragment(), PoiDialogFragment.PoiDialogListener {
 
     private lateinit var poi: Circle
     private lateinit var viewModel: CreatePOIViewModel
@@ -102,8 +106,9 @@ class CreatePOIFragment : Fragment() {
                 true
             }
             R.id.action_salvar -> {
-                viewModel.insertPoi(poi.center.latitude, poi.center.longitude, poi.radius)
-                findNavController().popBackStack()
+                val dialog = PoiDialogFragment()
+                dialog.setTargetFragment(this,0)
+                dialog.show(parentFragmentManager, "PoiDialogFragment")
                 true
             }
             else -> {
@@ -139,5 +144,10 @@ class CreatePOIFragment : Fragment() {
             }
         })
 
+    }
+
+    override fun onDialogPositiveClick(dialogFragment: DialogFragment, nome: String) {
+        viewModel.insertPoi(nome, poi.center.latitude, poi.center.longitude, poi.radius)
+        findNavController().popBackStack()
     }
 }

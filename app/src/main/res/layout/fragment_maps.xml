@@ -125,8 +125,6 @@
                     android:id="@+id/poi_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginStart="12dp"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:listitem="@layout/list_item_poi"
                     tools:itemCount="10"/>

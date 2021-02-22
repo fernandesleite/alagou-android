@@ -45,7 +45,7 @@ class MapsViewModel(application: Application) : AndroidViewModel(application) {
     val poiList: LiveData<List<Poi>>
         get() = _poiList
 
-    init {
+    fun refreshPoiCache() {
         viewModelScope.launch {
             _poiList.value = poiRepository.refreshPoiCache()
         }

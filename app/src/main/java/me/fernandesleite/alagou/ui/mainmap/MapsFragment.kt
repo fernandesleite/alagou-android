@@ -27,6 +27,8 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.Circle
+import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.libraries.places.api.Places
@@ -37,13 +39,15 @@ import com.nambimobile.widgets.efab.FabOption
 import me.fernandesleite.alagou.R
 import me.fernandesleite.alagou.databinding.FragmentMapsBinding
 import me.fernandesleite.alagou.models.Flooding
+import me.fernandesleite.alagou.persistence.Poi
 import me.fernandesleite.alagou.util.Directions
 import me.fernandesleite.alagou.util.GenerateMarkerIcon
 
-class MapsFragment : Fragment() {
+class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
 
     private val REQUEST_LOCATION_PERMISSION = 1
     private lateinit var map: GoogleMap
+    private lateinit var binding: FragmentMapsBinding
     private lateinit var viewModel: MapsViewModel
     private lateinit var navController: NavController
 
@@ -52,9 +56,9 @@ class MapsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewModel = ViewModelProvider(requireActivity()).get(MapsViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(MapsViewModel::class.java)
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-        val binding = FragmentMapsBinding.inflate(inflater)
+        binding = FragmentMapsBinding.inflate(inflater)
         Places.initialize(requireContext(), resources.getString(R.string.google_maps_api_key))
         val autocompleteFragment =
             childFragmentManager.findFragmentById(R.id.autocomplete_fragment)
@@ -72,6 +76,8 @@ class MapsFragment : Fragment() {
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         val account = GoogleSignIn.getLastSignedInAccount(requireContext())
+        val adapter = PoiAdapter(this)
+
         binding.apply {
             lifecycleOwner = this@MapsFragment
             btnCriarPonto.setOnClickListener { navigateToFragment(Directions.PONTO_ALAGAMENTO) }
@@ -79,14 +85,13 @@ class MapsFragment : Fragment() {
             headerNavigation.nomeUsuario.text = viewModel.getUserNameToken() ?: "Não Logado"
             headerNavigation.emailUsuario.text = viewModel.getUserEmailToken() ?: ""
             btnTraffic.setOnClickListener { viewModel.toggleTraffic() }
-            val adapter = PoiAdapter()
             poiList.adapter = adapter
+            viewModel.refreshPoiCache()
             viewModel.poiList.observe(viewLifecycleOwner, { list ->
                 adapter.submitList(list)
                 list.forEach {
                     Log.i("MapsFragment", it.id.toString())
                 }
-
             })
             bottomAppBar.setNavigationOnClickListener {
                 drawerLayout.open()
@@ -101,7 +106,6 @@ class MapsFragment : Fragment() {
             return root
         }
     }
-
     override fun onResume() {
         super.onResume()
         if (this::map.isInitialized) {
@@ -115,7 +119,6 @@ class MapsFragment : Fragment() {
             viewModel.setCurrentPosition(map.cameraPosition.target)
         }
     }
-
     // -------- Permission / Init ----------
 
     private fun enableLocation(map: GoogleMap): Boolean {
@@ -251,6 +254,12 @@ class MapsFragment : Fragment() {
 
             viewModel.trafficMap.observe(viewLifecycleOwner, {
                 toggleTrafego(it, btnTraffic)
+            })
+
+            viewModel.poiList.observe(viewLifecycleOwner, {
+                it.forEach { poi ->
+
+                }
 
             })
         }
@@ -332,5 +341,12 @@ class MapsFragment : Fragment() {
                 15f
             )
         )
+    }
+
+    override fun onClick(poi: Poi) {
+        val latLng = LatLng(poi.lat, poi.lng)
+        map.animateCamera(CameraUpdateFactory.newLatLng(latLng))
+        binding.drawerLayout.close()
+        Log.i("MapsFragment", "Clicado")
     }
 }

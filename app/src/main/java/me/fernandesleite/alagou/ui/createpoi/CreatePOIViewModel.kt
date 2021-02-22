@@ -34,9 +34,9 @@ class CreatePOIViewModel(application: Application): AndroidViewModel(application
         _markerActive.value = !_markerActive.value!!
     }
 
-    fun insertPoi(lat: Double, lng: Double , radius: Double){
+    fun insertPoi(nome: String, lat: Double, lng: Double , radius: Double){
         viewModelScope.launch {
-            poiRepository.insertPoiCache(lat, lng, radius)
+            poiRepository.insertPoiCache(nome, lat, lng, radius)
         }
     }
 }

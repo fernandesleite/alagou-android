@@ -7,7 +7,8 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "poi_table")
 data class Poi(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    @ColumnInfo val lat: Double?,
-    @ColumnInfo val lng: Double?,
-    @ColumnInfo val radius: Double?
+    @ColumnInfo val nome: String,
+    @ColumnInfo val lat: Double,
+    @ColumnInfo val lng: Double,
+    @ColumnInfo val radius: Double
 )

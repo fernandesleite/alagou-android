@@ -8,7 +8,12 @@ import androidx.recyclerview.widget.RecyclerView
 import me.fernandesleite.alagou.databinding.ListItemPoiBinding
 import me.fernandesleite.alagou.persistence.Poi
 
-class PoiAdapter() : ListAdapter<Poi, PoiAdapter.PoiViewHolder>(DiffCallback()) {
+class PoiAdapter(val listener: OnClickListener) :
+    ListAdapter<Poi, PoiAdapter.PoiViewHolder>(DiffCallback()) {
+    interface OnClickListener {
+        fun onClick(poi: Poi)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PoiViewHolder {
         return PoiViewHolder(
             ListItemPoiBinding.inflate(
@@ -22,7 +27,15 @@ class PoiAdapter() : ListAdapter<Poi, PoiAdapter.PoiViewHolder>(DiffCallback()) 
     override fun onBindViewHolder(holder: PoiViewHolder, position: Int) {
         val poi = getItem(position)
         holder.bind(poi)
+        holder.itemView.setOnClickListener {
+
+
+            listener.onClick(poi)
+
+
+        }
     }
+
 
     class PoiViewHolder(private val binding: ListItemPoiBinding) :
         RecyclerView.ViewHolder(binding.root) {

@@ -1,13 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android" >
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
     <data>
+
         <variable
             name="poi"
             type="me.fernandesleite.alagou.persistence.Poi" />
     </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="vertical"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_horizontal|bottom">
+
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@{Integer.toString(poi.id)}"/>
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:drawablePadding="6dp"
+            android:fontFamily="@font/nunito_bold"
+            android:text="@{poi.nome}"
+            android:textSize="18sp"
+            tools:text="@tools:sample/full_names"
+            app:drawableStartCompat="@drawable/ic_warning_24" />
+        <View
+
+            android:layout_width="250dp"
+            android:layout_height="1dp"
+            android:background="#C6C6C6"
+            />
+    </LinearLayout>
+
 </layout>

@@ -21,4 +21,6 @@
     <string name="alagou">Alagou!</string>
     <string name="monitore_e_evite_alagamentos">Monitore e evite alagamentos</string>
     <string name="ver_rotas_no_google_maps">Ver rotas no Google Maps</string>
+    <string name="nome_da_area_de_interesse">Nome da área de interesse:</string>
+    <string name="casa_trabalho">Casa, trabalho…</string>
 </resources>

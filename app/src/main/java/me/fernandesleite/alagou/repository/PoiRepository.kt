@@ -10,9 +10,9 @@ class PoiRepository(private val database: PoiDatabase) {
         withContext(Dispatchers.IO) {
             database.poiDao.getAllPoi()
         }
-    suspend fun insertPoiCache(lat: Double, lng: Double, radius: Double){
+    suspend fun insertPoiCache(nome: String, lat: Double, lng: Double, radius: Double){
         withContext(Dispatchers.IO) {
-            database.poiDao.insert(Poi(radius = radius,  lat = lat, lng = lng))
+            database.poiDao.insert(Poi(nome = nome, radius = radius,  lat = lat, lng = lng))
         }
     }
 }
