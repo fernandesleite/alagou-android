@@ -50,10 +50,19 @@
                         app:layout_anchor="@id/bottomAppBar" />
 
                     <com.nambimobile.widgets.efab.FabOption
+                        android:id="@+id/btn_logout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:fab_icon="@drawable/ic_login_24"
+                        app:fab_orientation="portrait"
+                        app:fab_color="@color/quantum_googred"
+                        app:label_text="Sair da conta" />
+
+                    <com.nambimobile.widgets.efab.FabOption
                         android:id="@+id/btn_criar_poi"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:fab_icon="@drawable/ic_settings_24"
+                        app:fab_icon="@drawable/ic_priority_high_24"
                         app:fab_orientation="portrait"
                         app:label_text="Criar área de interesse" />
 

@@ -22,7 +22,9 @@
             app:popUpTo="@id/mapsFragment"/>
         <action
             android:id="@+id/action_mapsFragment_to_displayFloodingInfoFragment"
-            app:destination="@id/displayFloodingInfoFragment" />
+            app:destination="@id/displayFloodingInfoFragment"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out"/>
         <action
             android:id="@+id/action_mapsFragment_to_createPOIFragment"
             app:destination="@id/createPOIFragment"
@@ -37,7 +39,7 @@
         android:label="fragment_request_location"
         tools:layout="@layout/fragment_request_location" >
         <action
-            android:id="@+id/action_requestLocationFragment_to_mapsFragment2"
+            android:id="@+id/action_requestLocationFragment_to_mapsFragment"
             app:destination="@id/mapsFragment" />
     </fragment>
     <fragment
@@ -79,7 +81,7 @@
             app:argType="string" />
     </fragment>
     <fragment
-        android:id="@+id/loginFragment2"
+        android:id="@+id/loginFragment"
         android:name="me.fernandesleite.alagou.ui.mainmap.LoginFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" />

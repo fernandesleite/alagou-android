@@ -7,8 +7,8 @@ import androidx.room.Query
 
 @Dao
 interface PoiDao {
-    @Query("SELECT * FROM poi_table")
-    fun getAllPoi(): List<Poi>
+    @Query("SELECT * FROM poi_table WHERE userTokenId = :userTokenId")
+    fun getAllPoi(userTokenId: String?): List<Poi>
     @Query("SELECT * FROM poi_table WHERE id = :id")
     fun getPoi(id: Int): Poi
     @Insert

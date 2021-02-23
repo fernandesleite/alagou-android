@@ -47,7 +47,7 @@ class MapsViewModel(application: Application) : AndroidViewModel(application) {
 
     fun refreshPoiCache() {
         viewModelScope.launch {
-            _poiList.value = poiRepository.refreshPoiCache()
+            _poiList.value = poiRepository.refreshPoiCache(userRepository.getTokenId())
         }
     }
 

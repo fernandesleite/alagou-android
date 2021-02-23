@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -76,11 +77,21 @@ class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         val account = GoogleSignIn.getLastSignedInAccount(requireContext())
         val adapter = PoiAdapter(this)
+        val gso: GoogleSignInOptions =
+            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(
+                "1080519531723-bu7li9b7qe49l53scd7oml814gr9s960.apps.googleusercontent.com"
+            ).requestEmail().build()
+        val mGoogleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
 
         binding.apply {
             lifecycleOwner = this@MapsFragment
             btnCriarPonto.setOnClickListener { navigateToFragment(Directions.PONTO_ALAGAMENTO) }
             btnCriarPoi.setOnClickListener { navigateToFragment(Directions.AREA_DE_INTERESSE) }
+            btnLogout.setOnClickListener {
+                mGoogleSignInClient.signOut()
+                mGoogleSignInClient.revokeAccess()
+                navController.navigate(R.id.loginFragment)
+            }
             headerNavigation.nomeUsuario.text = viewModel.getUserNameToken() ?: "Não Logado"
             headerNavigation.emailUsuario.text = viewModel.getUserEmailToken() ?: ""
             btnTraffic.setOnClickListener { viewModel.toggleTraffic() }
@@ -92,7 +103,7 @@ class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
             }
             if (account == null) {
                 btnCriarPonto.fabOptionEnabled = false
-                navController.navigate(R.id.loginFragment2)
+                navController.navigate(R.id.loginFragment)
             } else {
                 btnCriarPonto.fabOptionEnabled = true
                 mapFragment?.getMapAsync(callback(bottomAppBarText, btnTraffic))

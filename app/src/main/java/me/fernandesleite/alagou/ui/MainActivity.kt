@@ -9,8 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.location.LocationRequest
 import me.fernandesleite.alagou.R
 
@@ -36,10 +34,10 @@ class MainActivity : AppCompatActivity() {
             LocationRequest.PRIORITY_HIGH_ACCURACY -> {
                 if (resultCode == Activity.RESULT_OK) {
                     Log.e("Status: ", "On")
-                    navController.navigate(R.id.action_requestLocationFragment_to_mapsFragment2)
+                    navController.navigate(R.id.action_requestLocationFragment_to_mapsFragment)
                 } else {
                     Log.e("Status: ", "Off")
-                    navController.navigate(R.id.action_requestLocationFragment_to_mapsFragment2)
+                    navController.navigate(R.id.action_requestLocationFragment_to_mapsFragment)
                     Toast.makeText(applicationContext, "Alerta: GPS Desligado", Toast.LENGTH_LONG)
                         .show()
                 }
