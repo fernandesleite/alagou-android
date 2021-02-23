@@ -9,10 +9,12 @@ import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
 import me.fernandesleite.alagou.persistence.PoiDatabase
 import me.fernandesleite.alagou.repository.PoiRepository
+import me.fernandesleite.alagou.repository.UserRepository
 
 class CreatePOIViewModel(application: Application): AndroidViewModel(application) {
 
     private val poiRepository = PoiRepository(PoiDatabase.getInstance(application.applicationContext))
+    private val userRepository = UserRepository(application.applicationContext)
 
     private val _currentMarkerPosition = MutableLiveData<LatLng>()
     val currentMarkerPosition: LiveData<LatLng> = _currentMarkerPosition
@@ -36,7 +38,7 @@ class CreatePOIViewModel(application: Application): AndroidViewModel(application
 
     fun insertPoi(nome: String, lat: Double, lng: Double , radius: Double){
         viewModelScope.launch {
-            poiRepository.insertPoiCache(nome, lat, lng, radius)
+            poiRepository.insertPoiCache(nome, lat, lng, radius, userRepository.getTokenId())
         }
     }
 }

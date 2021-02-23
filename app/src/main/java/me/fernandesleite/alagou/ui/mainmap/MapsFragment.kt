@@ -112,8 +112,8 @@ class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
         super.onDestroyView()
         if (this::map.isInitialized) {
             viewModel.setCurrentPosition(map.cameraPosition.target)
+            map.clear()
         }
-        map.clear()
     }
     // -------- Permission / Init ----------
 

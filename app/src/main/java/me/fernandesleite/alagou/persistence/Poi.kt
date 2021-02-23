@@ -10,5 +10,6 @@ data class Poi(
     @ColumnInfo val nome: String,
     @ColumnInfo val lat: Double,
     @ColumnInfo val lng: Double,
-    @ColumnInfo val radius: Double
+    @ColumnInfo val radius: Double,
+    @ColumnInfo val userTokenId: String?,
 )
