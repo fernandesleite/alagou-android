@@ -25,6 +25,7 @@ class FloodingRepository {
                 call: Call<List<Flooding>>,
                 response: Response<List<Flooding>>
             ) {
+                Log.i("MapsfRagment", response.message())
                 floodings.value = response.body()
             }
 

@@ -35,6 +35,7 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import com.nambimobile.widgets.efab.FabOption
+import kotlinx.android.synthetic.main.fragment_maps.view.*
 import me.fernandesleite.alagou.R
 import me.fernandesleite.alagou.databinding.FragmentMapsBinding
 import me.fernandesleite.alagou.models.Flooding
@@ -85,12 +86,22 @@ class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
 
         binding.apply {
             lifecycleOwner = this@MapsFragment
-            btnCriarPonto.setOnClickListener { navigateToFragment(Directions.PONTO_ALAGAMENTO) }
-            btnCriarPoi.setOnClickListener { navigateToFragment(Directions.AREA_DE_INTERESSE) }
-            btnLogout.setOnClickListener {
-                mGoogleSignInClient.signOut()
-                mGoogleSignInClient.revokeAccess()
-                navController.navigate(R.id.loginFragment)
+            if(viewModel.getUserNameToken() == null) {
+                btnLogout.label.text = getString(R.string.entrar)
+                btnLogout.setOnClickListener {
+                    navController.navigate(R.id.loginFragment)
+                    btnLogout.setOnClickListener(null)
+                }
+            }
+            else {
+                btnLogout.label.text = getString(R.string.sair_da_conta)
+                btnCriarPonto.setOnClickListener { navigateToFragment(Directions.PONTO_ALAGAMENTO) }
+                btnCriarPoi.setOnClickListener { navigateToFragment(Directions.AREA_DE_INTERESSE) }
+                btnLogout.setOnClickListener {
+                    mGoogleSignInClient.signOut()
+                    mGoogleSignInClient.revokeAccess()
+                    navController.navigate(R.id.loginFragment)
+                }
             }
             headerNavigation.nomeUsuario.text = viewModel.getUserNameToken() ?: "Não Logado"
             headerNavigation.emailUsuario.text = viewModel.getUserEmailToken() ?: ""
@@ -249,11 +260,13 @@ class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
             map = googleMap
             enableLocation(map)
             map.setOnMarkerClickListener {
-                navController.navigate(
-                    MapsFragmentDirections.actionMapsFragmentToDisplayFloodingInfoFragment(
-                        it.tag.toString()
+                if (it.tag != null) {
+                    navController.navigate(
+                        MapsFragmentDirections.actionMapsFragmentToDisplayFloodingInfoFragment(
+                            it.tag.toString()
+                        )
                     )
-                )
+                }
                 true
             }
             map.setOnCameraIdleListener { getFloodingsInsideBounds() }
