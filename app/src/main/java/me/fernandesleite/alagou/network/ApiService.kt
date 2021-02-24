@@ -25,9 +25,6 @@ interface ApiService {
                      @Query("minlng") minLng: Double,
                      @Query("maxlng") maxLng: Double): Call<List<Flooding>>
 
-    @GET("floodings/all")
-   fun getAllFloodings(): Call<List<Flooding>>
-
     @POST("floodings")
     fun createFlooding(@Body flooding: FloodingPost): Call<FloodingPost>
 

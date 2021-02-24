@@ -132,7 +132,7 @@ class CreatePOIFragment : Fragment(), PoiDialogFragment.PoiDialogListener {
                         poi.remove()
                     }
                     poi = map.addCircle(GenerateCirclePoi.generateCircle(latLng, minRadius))
-                    viewModel.currentRadius.observe(viewLifecycleOwner, { poi.radius = it })
+                    viewModel.currentRadius.observe(viewLifecycleOwner, { radius -> poi.radius = radius })
                     marker = map.addMarker(
                         GenerateMarkerIcon.generateMarker(
                             requireContext(),

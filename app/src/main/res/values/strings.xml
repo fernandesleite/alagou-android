@@ -25,4 +25,6 @@
     <string name="casa_trabalho">Casa, trabalho…</string>
     <string name="entrar">Entrar</string>
     <string name="sair_da_conta">Sair da conta</string>
+    <string name="small_circle">Small Circle</string>
+    <string name="large_circle">Large Circle</string>
 </resources>

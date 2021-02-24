@@ -3,19 +3,13 @@ package me.fernandesleite.alagou.ui.createpoi
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.EditText
 import androidx.fragment.app.DialogFragment
 import me.fernandesleite.alagou.R
 
-class PoiDialogFragment: DialogFragment() {
-    lateinit var listener: PoiDialogListener
-    lateinit var editText: EditText
+class PoiDialogFragment : DialogFragment() {
+    private lateinit var listener: PoiDialogListener
 
     interface PoiDialogListener {
         fun onDialogPositiveClick(dialogFragment: DialogFragment, nome: String)
@@ -29,13 +23,13 @@ class PoiDialogFragment: DialogFragment() {
         builder.setView(view)
 
         builder.setPositiveButton(
-            "Confirmar",
-            DialogInterface.OnClickListener { dialogInterface, i ->
-                listener.onDialogPositiveClick(
-                    this,
-                    view.findViewById<EditText>(R.id.poi_nome).text.toString()
-                )
-            })
+            "Confirmar"
+        ) { _, _ ->
+            listener.onDialogPositiveClick(
+                this,
+                view.findViewById<EditText>(R.id.poi_nome).text.toString()
+            )
+        }
         return builder.create()
     }
 
@@ -44,7 +38,7 @@ class PoiDialogFragment: DialogFragment() {
 
         try {
             listener = targetFragment as PoiDialogListener
-        }catch (e: ClassCastException){
+        } catch (e: ClassCastException) {
             throw ClassCastException(
                 (context.toString() +
                         " must implement PoiDialogListener")

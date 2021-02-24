@@ -35,7 +35,6 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import com.nambimobile.widgets.efab.FabOption
-import kotlinx.android.synthetic.main.fragment_maps.view.*
 import me.fernandesleite.alagou.R
 import me.fernandesleite.alagou.databinding.FragmentMapsBinding
 import me.fernandesleite.alagou.models.Flooding
@@ -46,7 +45,7 @@ import me.fernandesleite.alagou.util.GenerateMarkerIcon
 
 class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
 
-    private val REQUEST_LOCATION_PERMISSION = 1
+    private val requestLocationPermission = 1
     private lateinit var map: GoogleMap
     private lateinit var binding: FragmentMapsBinding
     private lateinit var viewModel: MapsViewModel
@@ -157,7 +156,7 @@ class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
     private fun requestPermission() {
         requestPermissions(
             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-            REQUEST_LOCATION_PERMISSION
+            requestLocationPermission
         )
     }
 
@@ -226,7 +225,7 @@ class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_LOCATION_PERMISSION) {
+        if (requestCode == requestLocationPermission) {
             if (grantResults.contains(PackageManager.PERMISSION_GRANTED)) {
                 enableLocation(map)
             }

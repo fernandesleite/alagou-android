@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import me.fernandesleite.alagou.databinding.ListItemPoiBinding
 import me.fernandesleite.alagou.persistence.Poi
 
-class PoiAdapter(val listener: OnClickListener) :
+class PoiAdapter(private val listener: OnClickListener) :
     ListAdapter<Poi, PoiAdapter.PoiViewHolder>(DiffCallback()) {
     interface OnClickListener {
         fun onClick(poi: Poi)

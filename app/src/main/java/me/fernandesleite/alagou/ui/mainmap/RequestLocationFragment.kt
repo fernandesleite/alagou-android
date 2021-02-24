@@ -2,7 +2,6 @@ package me.fernandesleite.alagou.ui.mainmap
 
 import android.content.IntentSender
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -60,7 +59,7 @@ class RequestLocationFragment : Fragment() {
                                 exception as ResolvableApiException
 
                             resolvable.startResolutionForResult(
-                                activity, LocationRequest.PRIORITY_HIGH_ACCURACY
+                                requireActivity(), LocationRequest.PRIORITY_HIGH_ACCURACY
                             )
                         } catch (e: IntentSender.SendIntentException) {
                         } catch (e: ClassCastException) {

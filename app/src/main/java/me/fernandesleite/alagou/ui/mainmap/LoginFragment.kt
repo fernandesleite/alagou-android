@@ -57,7 +57,7 @@ class LoginFragment : Fragment() {
                 GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 viewModel.setTokenId(task.result)
-                viewModel.createUser(User(task.result.idToken, "${task.result.displayName}"))
+                viewModel.createUser(User(task.result.idToken, task.result.displayName))
                 findNavController().popBackStack()
             } catch (e: Exception) {
                 Log.i("LoginFragment", e.toString())
