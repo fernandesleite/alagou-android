@@ -2,6 +2,7 @@ package me.fernandesleite.alagou.ui.mainmap
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
@@ -34,6 +35,7 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.nambimobile.widgets.efab.FabOption
 import me.fernandesleite.alagou.R
 import me.fernandesleite.alagou.databinding.FragmentMapsBinding
@@ -102,7 +104,7 @@ class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
                     navController.navigate(R.id.loginFragment)
                 }
             }
-            headerNavigation.nomeUsuario.text = viewModel.getUserNameToken() ?: "Não Logado"
+            headerNavigation.nomeUsuario.text = viewModel.getUserNameToken() ?: getString(R.string.nao_logado)
             headerNavigation.emailUsuario.text = viewModel.getUserEmailToken() ?: ""
             btnTraffic.setOnClickListener { viewModel.toggleTraffic() }
             poiList.adapter = adapter
@@ -311,11 +313,11 @@ class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
     private fun toggleTrafego(isEnabled: Boolean, btnTraffic: FabOption) {
         map.isTrafficEnabled = isEnabled
         if (isEnabled) {
-            btnTraffic.label.labelText = "Tráfego ativado"
+            btnTraffic.label.labelText = getString(R.string.trafego_ativado)
             btnTraffic.fabOptionColor =
                 ContextCompat.getColor(requireContext(), R.color.active)
         } else {
-            btnTraffic.label.labelText = "Tráfego desativado"
+            btnTraffic.label.labelText = getString(R.string.trafego_desativado)
             btnTraffic.fabOptionColor =
                 ContextCompat.getColor(
                     requireContext(),
@@ -371,9 +373,24 @@ class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
         )
     }
 
-    override fun onClick(poi: Poi) {
+    override fun onPoiClick(poi: Poi) {
         val latLng = LatLng(poi.lat, poi.lng)
         map.animateCamera(CameraUpdateFactory.newLatLng(latLng))
         binding.drawerLayout.close()
+    }
+
+    override fun onPoiLongClick(poi: Poi) {
+        AlertDialog.Builder(requireContext())
+            .setTitle(poi.nome)
+            .setMessage(getString(R.string.deletar_area_de_interesse))
+            .setNeutralButton(getString(R.string.cancelar)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setPositiveButton(getString(R.string.deletar)) { dialog, _ ->
+                viewModel.deletePoi(poi)
+                viewModel.refreshPoiCache()
+                dialog.dismiss()
+            }
+            .show()
     }
 }

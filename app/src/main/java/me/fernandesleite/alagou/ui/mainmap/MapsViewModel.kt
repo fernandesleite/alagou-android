@@ -51,6 +51,12 @@ class MapsViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun deletePoi(poi: Poi){
+        viewModelScope.launch {
+            poiRepository.deletePoi(poi)
+        }
+    }
+
     fun started() {
         _dataLoading.value = true
     }

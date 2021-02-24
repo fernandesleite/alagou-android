@@ -56,7 +56,7 @@
                         app:fab_icon="@drawable/ic_login_24"
                         app:fab_orientation="portrait"
                         app:fab_color="@color/quantum_googred"
-                        app:label_text="Sair da conta" />
+                        app:label_text="@string/sair_da_conta" />
 
                     <com.nambimobile.widgets.efab.FabOption
                         android:id="@+id/btn_criar_poi"
@@ -64,7 +64,7 @@
                         android:layout_height="wrap_content"
                         app:fab_icon="@drawable/ic_priority_high_24"
                         app:fab_orientation="portrait"
-                        app:label_text="Criar área de interesse" />
+                        app:label_text="@string/criar_area_de_interesse" />
 
                     <com.nambimobile.widgets.efab.FabOption
                         android:id="@+id/btn_criar_ponto"
@@ -72,7 +72,7 @@
                         android:layout_height="wrap_content"
                         app:fab_icon="@drawable/ic_add_location_24"
                         app:fab_orientation="portrait"
-                        app:label_text="Criar ponto de alagamento" />
+                        app:label_text="@string/criar_ponto_de_alagamento" />
 
                     <com.nambimobile.widgets.efab.FabOption
                         android:id="@+id/btn_traffic"
@@ -80,7 +80,7 @@
                         android:layout_height="wrap_content"
                         app:fab_icon="@drawable/ic_traffic_24"
                         app:fab_orientation="portrait"
-                        app:label_text="Tráfego desativado" />
+                        app:label_text="@string/trafego_desativado" />
 
                     <com.google.android.material.bottomappbar.BottomAppBar
                         android:id="@+id/bottomAppBar"

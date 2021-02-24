@@ -16,7 +16,6 @@
     <string name="carregando_localizacao">Carregando localização</string>
     <string name="label_observacoes">Observações</string>
     <string name="ponto_de_alagamento">Ponto de alagamento</string>
-    <string name="cancelar">Cancelar</string>
     <string name="salvar">Salvar</string>
     <string name="alagou">Alagou!</string>
     <string name="monitore_e_evite_alagamentos">Monitore e evite alagamentos</string>
@@ -24,7 +23,15 @@
     <string name="nome_da_area_de_interesse">Nome da área de interesse:</string>
     <string name="casa_trabalho">Casa, trabalho…</string>
     <string name="entrar">Entrar</string>
-    <string name="sair_da_conta">Sair da conta</string>
     <string name="small_circle">Small Circle</string>
     <string name="large_circle">Large Circle</string>
+    <string name="deletar_area_de_interesse">Deletar área de interesse?</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="deletar">Deletar</string>
+    <string name="criar_ponto_de_alagamento">Criar ponto de alagamento</string>
+    <string name="criar_area_de_interesse">Criar área de interesse</string>
+    <string name="sair_da_conta">Sair da conta</string>
+    <string name="trafego_desativado">Tráfego desativado</string>
+    <string name="trafego_ativado">Tráfego ativado</string>
+    <string name="nao_logado">Entre em uma conta</string>
 </resources>

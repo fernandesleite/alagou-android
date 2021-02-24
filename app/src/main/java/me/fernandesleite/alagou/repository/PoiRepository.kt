@@ -15,4 +15,9 @@ class PoiRepository(private val database: PoiDatabase) {
             database.poiDao.insert(Poi(nome = nome, radius = radius,  lat = lat, lng = lng, userTokenId = userTokenId))
         }
     }
+    suspend fun deletePoi(poi: Poi){
+        withContext(Dispatchers.IO) {
+            database.poiDao.delete(poi)
+        }
+    }
 }

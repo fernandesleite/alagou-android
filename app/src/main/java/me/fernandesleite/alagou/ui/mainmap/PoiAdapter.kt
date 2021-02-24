@@ -11,7 +11,8 @@ import me.fernandesleite.alagou.persistence.Poi
 class PoiAdapter(private val listener: OnClickListener) :
     ListAdapter<Poi, PoiAdapter.PoiViewHolder>(DiffCallback()) {
     interface OnClickListener {
-        fun onClick(poi: Poi)
+        fun onPoiClick(poi: Poi)
+        fun onPoiLongClick(poi: Poi)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PoiViewHolder {
@@ -28,11 +29,11 @@ class PoiAdapter(private val listener: OnClickListener) :
         val poi = getItem(position)
         holder.bind(poi)
         holder.itemView.setOnClickListener {
-
-
-            listener.onClick(poi)
-
-
+            listener.onPoiClick(poi)
+        }
+        holder.itemView.setOnLongClickListener {
+            listener.onPoiLongClick(poi)
+            true
         }
     }
 
@@ -52,6 +53,5 @@ class PoiAdapter(private val listener: OnClickListener) :
         override fun areContentsTheSame(oldItem: Poi, newItem: Poi): Boolean {
             return oldItem == newItem
         }
-
     }
 }
