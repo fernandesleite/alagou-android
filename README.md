@@ -29,3 +29,4 @@ Alagou! - Real-time crowd-sourced Android app for monitoring and alerting floods
   
 ## TODO
 - [ ] Sync Points of Interest to backend
+- [ ] Deal with API offline
