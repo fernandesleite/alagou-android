@@ -250,7 +250,7 @@ class MapsFragment : Fragment(), PoiAdapter.OnClickListener {
             val rlp = locationButton.layoutParams as (RelativeLayout.LayoutParams)
             rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
             rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0)
-            rlp.setMargins(0, 250, 100, 0)
+            rlp.setMargins(0, 200, 25, 0)
 
             googleMap.setMapStyle(
                 MapStyleOptions.loadRawResourceStyle(
